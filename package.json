@@ -3,7 +3,7 @@
     "displayName": "Command Code Go for VS Code",
     "description": "Use Command Code Go models in the GitHub Copilot Chat model picker for vscode. Vision, thinking mode, agent tools — BYOK.",
     "icon": "resources/icon.png",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "publisher": "hotrungnhan",
     "author": "Ho Trung Nhan",
     "license": "MIT",

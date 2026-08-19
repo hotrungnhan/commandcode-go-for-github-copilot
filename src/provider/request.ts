@@ -5,8 +5,14 @@ import { getDebugLoggingEnabled, getMaxTokens, getZdrEnabled } from '../config';
 import { DEFAULT_MAX_OUTPUT_TOKENS, TOOLS_LIMIT } from '../consts';
 import { t } from '../i18n';
 import { logger } from '../logger';
-import type { ChatRequest, CommandCodeGenerateParams, ReasoningEffort } from '../types';
-import { convertMessages, convertTools, countMessageChars, toGenerateMessages } from './convert';
+import type { ChatRequest, ChatTool, ReasoningEffort } from '../types';
+import {
+	convertMessages,
+	convertTools,
+	countMessageChars,
+	toGenerateMessages,
+	toGenerateTools,
+} from './convert';
 import { collectRequestConfig, getThreadId } from './context';
 import { getConfiguredThinkingEffort, type ModelConfigurationOptions } from './models';
 
@@ -53,6 +59,7 @@ export async function prepareChatRequest({
 
 	const chatMessages = convertMessages(messages, { imageInput });
 	const tools = prepareTools(modelDefinition?.capabilities.toolCalling, options);
+	const generateTools = toGenerateTools(tools);
 
 	const totalRequestChars = countMessageChars(chatMessages);
 	const thinkingEffort: 'none' | ReasoningEffort = thinkingCapability
@@ -67,12 +74,13 @@ export async function prepareChatRequest({
 		params: {
 			model: modelInfo.id,
 			messages: toGenerateMessages(chatMessages),
-			tools: tools ?? [],
+			tools: generateTools ?? [],
 			system: '',
 			max_tokens: maxTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
 			temperature: 0.3,
 			stream: true,
-			...(tools && tools.length > 0 ? { tool_choice: 'auto' as const } : {}),
+			// `/alpha/generate` selects tools automatically when `tools` is present;
+			// unlike Chat Completions, it does not use a string `tool_choice` field.
 			// Attach `reasoning_effort` only when thinking is enabled. `none`
 			// intentionally omits the field so the upstream model uses its
 			// default (non-thinking) behavior.
@@ -97,7 +105,7 @@ export async function prepareChatRequest({
 function prepareTools(
 	toolCallingCapability: boolean | number | undefined,
 	options: vscode.ProvideLanguageModelChatResponseOptions,
-): CommandCodeGenerateParams['tools'] | undefined {
+): ChatTool[] | undefined {
 	if (!toolCallingCapability) {
 		return undefined;
 	}

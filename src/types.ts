@@ -53,6 +53,19 @@ export interface ChatTool {
 	};
 }
 
+/**
+ * Tool definition used by Command Code's `/alpha/generate` envelope.
+ *
+ * This endpoint does not accept the OpenAI `{ type, function: {...} }` shape;
+ * it expects the Vercel/CLI shape with the name and JSON schema at the top
+ * level.
+ */
+export interface CommandCodeTool {
+	name: string;
+	description: string;
+	input_schema: Record<string, unknown>;
+}
+
 export interface ChatUsage {
 	prompt_tokens: number;
 	completion_tokens: number;
@@ -77,22 +90,31 @@ export interface CommandCodeRequestConfig {
 /** A message encoded in the `params.messages` format used by `/alpha/generate`. */
 export interface CommandCodeGenerateMessage {
 	role: ChatRole;
-	content: ChatMessagePart[];
-	tool_call_id?: string;
-	tool_calls?: ChatToolCall[];
-	reasoning_content?: string;
+	content: CommandCodeMessagePart[];
 }
+
+/** Content parts accepted by the Vercel AI SDK message schema. */
+export type CommandCodeMessagePart =
+	| { type: 'text'; text: string }
+	| { type: 'image'; image: string; mimeType?: string }
+	| { type: 'reasoning'; text: string }
+	| { type: 'tool-call'; toolCallId: string; toolName: string; input: Record<string, unknown> }
+	| {
+			type: 'tool-result';
+			toolCallId: string;
+			toolName: string;
+			output: { type: 'text' | 'error-text'; value: string };
+	  };
 
 /** Parameters accepted by the Command Code generate endpoint. */
 export interface CommandCodeGenerateParams {
 	model: string;
 	messages: CommandCodeGenerateMessage[];
-	tools: ChatTool[];
+	tools: CommandCodeTool[];
 	system: string;
 	max_tokens: number;
 	temperature: number;
 	stream: true;
-	tool_choice?: 'none' | 'auto' | 'required';
 	reasoning_effort?: ReasoningEffort;
 }
 

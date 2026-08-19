@@ -5,6 +5,8 @@ import type {
 	ChatMessagePart,
 	ChatTool,
 	ChatToolCall,
+	CommandCodeMessagePart,
+	CommandCodeTool,
 	CommandCodeGenerateMessage,
 } from '../types';
 
@@ -173,20 +175,102 @@ export function convertTools(
 }
 
 /**
+ * Convert the OpenAI-shaped intermediate tools to Command Code's wire shape.
+ * `/alpha/generate` expects `name`, `description`, and `input_schema` at the
+ * top level of each definition.
+ */
+export function toGenerateTools(
+	tools: readonly ChatTool[] | undefined,
+): CommandCodeTool[] | undefined {
+	if (!tools || tools.length === 0) {
+		return undefined;
+	}
+
+	return tools.map((tool) => ({
+		name: tool.function.name,
+		description: tool.function.description ?? '',
+		input_schema: tool.function.parameters ?? { type: 'object', properties: {} },
+	}));
+}
+
+/**
  * Turn the OpenAI-shaped intermediate messages into the content-part format
  * required by Command Code's `/alpha/generate` endpoint.
  */
 export function toGenerateMessages(messages: ChatMessage[]): CommandCodeGenerateMessage[] {
-	return messages.map((message) => ({
-		role: message.role,
-		content:
-			message.parts && message.parts.length > 0
-				? message.parts
-				: [{ type: 'text', text: message.content }],
-		...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {}),
-		...(message.tool_calls ? { tool_calls: message.tool_calls } : {}),
-		...(message.reasoning_content ? { reasoning_content: message.reasoning_content } : {}),
-	}));
+	const toolNames = new Map<string, string>();
+
+	return messages.map((message) => {
+		if (message.role === 'tool') {
+			const toolCallId = message.tool_call_id ?? '';
+			const toolName = toolNames.get(toolCallId) ?? 'unknown';
+			return {
+				role: 'tool' as const,
+				content: [
+					{
+						type: 'tool-result' as const,
+						toolCallId,
+						toolName,
+						output: { type: 'text' as const, value: message.content },
+					},
+				],
+			};
+		}
+
+		const content: CommandCodeMessagePart[] = [];
+		if (message.role === 'assistant' && message.reasoning_content) {
+			content.push({ type: 'reasoning', text: message.reasoning_content });
+		}
+		if (message.parts && message.parts.length > 0) {
+			for (const part of message.parts) {
+				if (part.type === 'image_url') {
+					const imageUrl = part.image_url?.url;
+					if (imageUrl) {
+						content.push({
+							type: 'image',
+							image: imageUrl,
+							...(getMediaType(imageUrl) ? { mimeType: getMediaType(imageUrl) } : {}),
+						});
+					}
+				} else if (part.text !== undefined) {
+					content.push({ type: 'text', text: part.text });
+				}
+			}
+		} else if (message.content || message.role !== 'assistant') {
+			content.push({ type: 'text', text: message.content });
+		}
+
+		if (message.role === 'assistant' && message.tool_calls) {
+			for (const toolCall of message.tool_calls) {
+				const toolName = toolCall.function.name;
+				toolNames.set(toolCall.id, toolName);
+				content.push({
+					type: 'tool-call',
+					toolCallId: toolCall.id,
+					toolName,
+					input: parseToolArguments(toolCall.function.arguments),
+				});
+			}
+		}
+
+		return { role: message.role, content };
+	});
+}
+
+function parseToolArguments(value: string): Record<string, unknown> {
+	try {
+		const parsed: unknown = JSON.parse(value);
+		return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+			? (parsed as Record<string, unknown>)
+			: {};
+	} catch {
+		return {};
+	}
+}
+
+function getMediaType(url: string): string | undefined {
+	const match = /^data:([^;,]+)[;,]/u.exec(url);
+	return match?.[1];
 }
 
 /**
