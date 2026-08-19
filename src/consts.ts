@@ -39,7 +39,8 @@ export const WELCOME_SHOWN_KEY = 'commandcode-copilot.welcomeShown';
 // ---- Walkthrough ----
 
 /** Walkthrough contribution ID. */
-export const WALKTHROUGH_ID = 'Tyrannmisu.commandcode-copilot-provider#commandcodeGettingStarted';
+export const WALKTHROUGH_ID =
+	'hotrungnhan.command-code-go-for-github-copilot#commandcodeGettingStarted';
 
 // ---- Limits ----
 
@@ -48,8 +49,20 @@ export const TOOLS_LIMIT = 128;
 
 // ---- Provider defaults ----
 
-/** Default Command Code Provider API base URL. */
-export const DEFAULT_BASE_URL = 'https://api.commandcode.ai/provider/v1';
+/** Default Command Code Generate API base URL. */
+export const DEFAULT_BASE_URL = 'https://api.commandcode.ai/alpha';
+
+/**
+ * Command Code's current CLI protocol version. The API requires a CLI-version
+ * header even when the caller is this VS Code extension.
+ */
+export const COMMAND_CODE_CLIENT_VERSION = '1.28.1';
+
+/** Sentinel thread ID accepted by the Generate API when VS Code provides none. */
+export const DEFAULT_THREAD_ID = '00000000-0000-0000-0000-000000000000';
+
+/** Generate API default used when the user has not configured a token cap. */
+export const DEFAULT_MAX_OUTPUT_TOKENS = 64_000;
 
 /** Vendor ID exposed to GitHub Copilot Chat. */
 export const VENDOR_ID = 'commandcode';

@@ -26,7 +26,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		logger.info(`Extension activated version=${context.extension.packageJSON.version}`);
 	} catch (error) {
 		activeProvider = undefined;
-		logger.error('Failed to activate Command Code extension', error);
+		logger.error('Failed to activate Command Code Go extension', error);
 		void vscode.window.showErrorMessage(t('extension.activateFailed'));
 		throw error;
 	}

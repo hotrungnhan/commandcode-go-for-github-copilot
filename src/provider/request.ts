@@ -1,12 +1,13 @@
 import vscode from 'vscode';
 import { AuthManager } from '../auth';
 import { CommandCodeClient, ZDR_HEADER } from '../client';
-import { getApiModelId, getBaseUrl, getMaxTokens, getZdrEnabled } from '../config';
-import { TOOLS_LIMIT } from '../consts';
+import { getDebugLoggingEnabled, getMaxTokens, getZdrEnabled } from '../config';
+import { DEFAULT_MAX_OUTPUT_TOKENS, TOOLS_LIMIT } from '../consts';
 import { t } from '../i18n';
 import { logger } from '../logger';
-import type { ChatRequest, ReasoningEffort } from '../types';
-import { convertMessages, convertTools, countMessageChars } from './convert';
+import type { ChatRequest, CommandCodeGenerateParams, ReasoningEffort } from '../types';
+import { convertMessages, convertTools, countMessageChars, toGenerateMessages } from './convert';
+import { collectRequestConfig, getThreadId } from './context';
 import { getConfiguredThinkingEffort, type ModelConfigurationOptions } from './models';
 
 export interface PreparedChatRequest {
@@ -39,9 +40,11 @@ export async function prepareChatRequest({
 		throw new Error(t('auth.notConfigured'));
 	}
 
-	const baseUrl = getBaseUrl();
 	const extraHeaders = getZdrEnabled() ? ZDR_HEADER : undefined;
-	const client = new CommandCodeClient(baseUrl, apiKey, { extraHeaders });
+	const client = new CommandCodeClient(apiKey, {
+		extraHeaders,
+		debug: getDebugLoggingEnabled(),
+	});
 
 	const thinkingCapability = modelDefinition?.capabilities.thinking;
 	const isThinkingModel = Boolean(thinkingCapability);
@@ -52,29 +55,34 @@ export async function prepareChatRequest({
 	const tools = prepareTools(modelDefinition?.capabilities.toolCalling, options);
 
 	const totalRequestChars = countMessageChars(chatMessages);
-	const baseRequest: ChatRequest = {
-		model: getApiModelId(modelInfo.id),
-		messages: chatMessages,
-		stream: true,
-		tools,
-		tool_choice: tools && tools.length > 0 ? ('auto' as const) : undefined,
-		max_tokens: maxTokens,
-	};
-
 	const thinkingEffort: 'none' | ReasoningEffort = thinkingCapability
 		? getConfiguredThinkingEffort(options as ModelConfigurationOptions, thinkingCapability)
 		: 'none';
 
 	const request: ChatRequest = {
-		...baseRequest,
-		// Attach `reasoning_effort` only when thinking is enabled. `none`
-		// intentionally omits the field so the upstream model uses its
-		// default (non-thinking) behavior.
-		...(isThinkingModel && thinkingEffort !== 'none' ? { reasoning_effort: thinkingEffort } : {}),
+		config: await collectRequestConfig(),
+		memory: '',
+		taste: '',
+		skills: '',
+		params: {
+			model: modelInfo.id,
+			messages: toGenerateMessages(chatMessages),
+			tools: tools ?? [],
+			system: '',
+			max_tokens: maxTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
+			temperature: 0.3,
+			stream: true,
+			...(tools && tools.length > 0 ? { tool_choice: 'auto' as const } : {}),
+			// Attach `reasoning_effort` only when thinking is enabled. `none`
+			// intentionally omits the field so the upstream model uses its
+			// default (non-thinking) behavior.
+			...(isThinkingModel && thinkingEffort !== 'none' ? { reasoning_effort: thinkingEffort } : {}),
+		},
+		threadId: getThreadId(options),
 	};
 
 	logger.debug(
-		`Prepared request: model=${request.model} messages=${chatMessages.length} tools=${tools?.length ?? 0} thinking=${thinkingEffort}`,
+		`Prepared request: model=${request.params.model} messages=${chatMessages.length} tools=${tools?.length ?? 0} thinking=${thinkingEffort}`,
 	);
 
 	return {
@@ -89,7 +97,7 @@ export async function prepareChatRequest({
 function prepareTools(
 	toolCallingCapability: boolean | number | undefined,
 	options: vscode.ProvideLanguageModelChatResponseOptions,
-): ChatRequest['tools'] {
+): CommandCodeGenerateParams['tools'] | undefined {
 	if (!toolCallingCapability) {
 		return undefined;
 	}

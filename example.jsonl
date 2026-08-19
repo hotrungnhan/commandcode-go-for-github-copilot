@@ -1,0 +1,494 @@
+{
+    "type": "start"
+}
+{
+    "type": "start-step",
+    "request": {
+        "body": {
+            "maxOutputTokens": 64000,
+            "prompt": [
+                {
+                    "role": "system",
+                    "content": "<role>\nYou are a confident, efficient software engineer and coding `git log` when you need the current repository state.\n</context>"
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Hello, can you do me a favor ?"
+                        }
+                    ]
+                }
+            ],
+            "providerOptions": {
+                "gateway": {
+                    "caching": "auto",
+                    "sort": "ttft",
+                    "only": [
+                        "deepseek"
+                    ]
+                }
+            },
+            "includeRawChunks": false
+        }
+    },
+    "warnings": []
+}
+{
+    "type": "reasoning-start",
+    "id": "reasoning-0",
+    "providerMetadata": {
+        "gateway": {
+            "generationId": "gen_01M0D28KW20Y487CBRMMARYW1D"
+        }
+    }
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": "The"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " user"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " greeted"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " me"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " with"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " a"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " general"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " request"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " asking"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " for"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " help"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": "."
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " I"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " should"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " respond"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " conversation"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": "ally"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " and"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " ask"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " what"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " they"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " need"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " help"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " with"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": ","
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " without"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " doing"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " any"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " tool"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " calls"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " yet"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " since"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " I"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " don"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": "'t"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " have"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " a"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " specific"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": " task"
+}
+{
+    "type": "reasoning-delta",
+    "id": "reasoning-0",
+    "text": "."
+}
+{
+    "type": "text-start",
+    "id": "txt-0"
+}
+{
+    "type": "reasoning-end",
+    "id": "reasoning-0"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": "Sure"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": ","
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": " what"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": " do"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": " you"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": " need"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": " help"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": " with"
+}
+{
+    "type": "text-delta",
+    "id": "txt-0",
+    "text": "?"
+}
+{
+    "type": "text-end",
+    "id": "txt-0"
+}
+{
+    "type": "finish-step",
+    "finishReason": "stop",
+    "rawFinishReason": "stop",
+    "usage": {
+        "inputTokens": 7644,
+        "inputTokenDetails": {
+            "noCacheTokens": 92,
+            "cacheReadTokens": 7552
+        },
+        "outputTokens": 50,
+        "outputTokenDetails": {
+            "textTokens": 10,
+            "reasoningTokens": 40
+        },
+        "totalTokens": 7694,
+        "raw": {
+            "prompt_tokens": 7644,
+            "completion_tokens": 50,
+            "prompt_cache_hit_tokens": 7552,
+            "prompt_cache_miss_tokens": 92,
+            "total_tokens": 7694,
+            "completion_tokens_details": {
+                "reasoning_tokens": 40
+            }
+        },
+        "reasoningTokens": 40,
+        "cachedInputTokens": 7552
+    },
+    "providerMetadata": {
+        "deepseek": {
+            "promptCacheHitTokens": 7552,
+            "promptCacheMissTokens": 92
+        },
+        "gateway": {
+            "routing": {
+                "originalModelId": "deepseek/deepseek-v4-flash",
+                "resolvedProvider": "deepseek",
+                "fallbacksAvailable": [],
+                "planningReasoning": "Provider set restricted to: deepseek. System credentials planned for: deepseek. Team preference: system credentials attempted before BYOK credentials. Total execution order: deepseek(system)",
+                "canonicalSlug": "deepseek/deepseek-v4-flash",
+                "finalProvider": "deepseek",
+                "modelAttemptCount": 1,
+                "modelAttempts": [
+                    {
+                        "canonicalSlug": "deepseek/deepseek-v4-flash",
+                        "success": true,
+                        "providerAttemptCount": 1,
+                        "providerAttempts": [
+                            {
+                                "provider": "deepseek",
+                                "credentialType": "system",
+                                "success": true,
+                                "startTime": 1787144982417,
+                                "endTime": 1787144983595,
+                                "providerRequestId": "2307f20f3bd3737e9ae84c041bc2343e",
+                                "statusCode": 200,
+                                "providerResponseId": "711f2cb0-0b12-4216-96b8-a528e1be1b12"
+                            }
+                        ]
+                    }
+                ],
+                "totalProviderAttemptCount": 1,
+                "sort": {
+                    "option": "ttft",
+                    "executionOrder": [
+                        "deepseek",
+                        "deepseek"
+                    ],
+                    "metrics": {
+                        "deepseek": 1752
+                    },
+                    "deprioritizedProviders": []
+                }
+            },
+            "cost": "0.000106104",
+            "marketCost": "0.000106104",
+            "surchargeCost": "0",
+            "gatewayCost": "0.000106104",
+            "inferenceCost": "0.000106104",
+            "inputInferenceCost": "0.000073104",
+            "outputInferenceCost": "0.000033",
+            "generationId": "gen_01M0D28KW20Y487CBRMMARYW1D"
+        }
+    },
+    "response": {
+        "id": "711f2cb0-0b12-4216-96b8-a528e1be1b12",
+        "timestamp": "2026-08-19T13:09:42.000Z",
+        "modelId": "deepseek-v4-flash",
+        "headers": {
+            "access-control-allow-headers": "Content-Type, Authorization, ai-gateway-auth-method, ai-gateway-protocol-version, ai-model-id, ai-language-model-id, ai-language-model-specification-version, ai-image-model-specification-version, ai-embedding-model-specification-version, ai-language-model-streaming, ai-reporting-tags, ai-reporting-user, http-referer, x-title, anthropic-beta, x-vercel-ai-gateway-team, x-session-id, x-session-affinity",
+            "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+            "access-control-allow-origin": "*",
+            "cache-control": "no-cache, no-transform",
+            "cf-cache-status": "DYNAMIC",
+            "cf-ray": "a2d964e95ba5fdc6-SIN",
+            "connection": "close",
+            "content-type": "text/event-stream",
+            "date": "Wed, 19 Aug 2026 13:09:42 GMT",
+            "server": "cloudflare",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "transfer-encoding": "chunked",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-effective-store": "false",
+            "x-generation-id": "gen_01M0D28KW20Y487CBRMMARYW1D",
+            "x-matched-path": "/v3/ai/language-model",
+            "x-model-id": "deepseek/deepseek-v4-flash",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "sin1::fra1::8bcql-1787144981982-6b26760c52f9"
+        }
+    }
+}
+{
+    "type": "finish",
+    "finishReason": "stop",
+    "rawFinishReason": "stop",
+    "totalUsage": {
+        "inputTokens": 7644,
+        "inputTokenDetails": {
+            "noCacheTokens": 92,
+            "cacheReadTokens": 7552
+        },
+        "outputTokens": 50,
+        "outputTokenDetails": {
+            "textTokens": 10,
+            "reasoningTokens": 40
+        },
+        "totalTokens": 7694,
+        "reasoningTokens": 40,
+        "cachedInputTokens": 7552
+    }
+}
+{
+    "type": "provider-metadata",
+    "providerMetadata": {
+        "deepseek": {
+            "promptCacheHitTokens": 7552,
+            "promptCacheMissTokens": 92
+        },
+        "gateway": {
+            "routing": {
+                "originalModelId": "deepseek/deepseek-v4-flash",
+                "resolvedProvider": "deepseek",
+                "fallbacksAvailable": [],
+                "planningReasoning": "Provider set restricted to: deepseek. System credentials planned for: deepseek. Team preference: system credentials attempted before BYOK credentials. Total execution order: deepseek(system)",
+                "canonicalSlug": "deepseek/deepseek-v4-flash",
+                "finalProvider": "deepseek",
+                "modelAttemptCount": 1,
+                "modelAttempts": [
+                    {
+                        "canonicalSlug": "deepseek/deepseek-v4-flash",
+                        "success": true,
+                        "providerAttemptCount": 1,
+                        "providerAttempts": [
+                            {
+                                "provider": "deepseek",
+                                "credentialType": "system",
+                                "success": true,
+                                "startTime": 1787144982417,
+                                "endTime": 1787144983595,
+                                "providerRequestId": "2307f20f3bd3737e9ae84c041bc2343e",
+                                "statusCode": 200,
+                                "providerResponseId": "711f2cb0-0b12-4216-96b8-a528e1be1b12"
+                            }
+                        ]
+                    }
+                ],
+                "totalProviderAttemptCount": 1,
+                "sort": {
+                    "option": "ttft",
+                    "executionOrder": [
+                        "deepseek",
+                        "deepseek"
+                    ],
+                    "metrics": {
+                        "deepseek": 1752
+                    },
+                    "deprioritizedProviders": []
+                }
+            },
+            "cost": "0.000106104",
+            "marketCost": "0.000106104",
+            "surchargeCost": "0",
+            "gatewayCost": "0.000106104",
+            "inferenceCost": "0.000106104",
+            "inputInferenceCost": "0.000073104",
+            "outputInferenceCost": "0.000033",
+            "generationId": "gen_01M0D28KW20Y487CBRMMARYW1D"
+        }
+    }
+}

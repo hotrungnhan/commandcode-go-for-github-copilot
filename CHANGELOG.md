@@ -10,7 +10,7 @@
 
 ### Features
 
-- Initial release — Command Code for Copilot Chat provider.
+- Initial release — Command Code Go for VS Code.
 - Pulls live model list from `GET /provider/v1/models` and exposes them in the Copilot Chat model picker.
 - Streaming Chat Completions over the OpenAI-compatible `/provider/v1/chat/completions` endpoint.
 - BYOK API key stored in VS Code SecretStorage.

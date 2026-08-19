@@ -71,6 +71,8 @@ export function getNetworkErrorMessage(code: string | undefined): string {
 			return t('error.network.configuration', errorCode);
 		case 'generic':
 			return t('error.network.generic', errorCode);
+		default:
+			return t('error.network.generic', errorCode);
 	}
 }
 

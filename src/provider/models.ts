@@ -6,7 +6,6 @@ import type {
 	ThinkingCapability,
 	ThinkingEffort,
 } from '../types';
-import { getMaxContextTokensOverride } from '../config';
 
 /**
  * Non-public Copilot Chat API surface.
@@ -33,9 +32,6 @@ export type ModelPickerChatInformation = vscode.LanguageModelChatInformation & {
 
 export function toChatInfo(m: ModelDefinition, hasApiKey: boolean): ModelPickerChatInformation {
 	const thinkingCapability = m.capabilities.thinking;
-	const contextOverride = getMaxContextTokensOverride();
-	const maxInputTokens = contextOverride > 0 ? contextOverride : m.maxInputTokens;
-
 	return {
 		id: m.id,
 		name: m.name,
@@ -44,7 +40,7 @@ export function toChatInfo(m: ModelDefinition, hasApiKey: boolean): ModelPickerC
 		detail: hasApiKey ? m.detail : t('auth.apiKeyRequiredDetail'),
 		tooltip: hasApiKey ? m.detail : t('auth.apiKeyRequiredDetail'),
 		statusIcon: hasApiKey ? undefined : new vscode.ThemeIcon('warning'),
-		maxInputTokens,
+		maxInputTokens: m.maxInputTokens,
 		maxOutputTokens: m.maxOutputTokens,
 		isBYOK: true,
 		isUserSelectable: true,

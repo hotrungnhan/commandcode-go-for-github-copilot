@@ -25,7 +25,7 @@ const zh: Translations = {
 	'auth.emptyValidation': 'API Key 不能为空',
 	'auth.saved': 'API Key 已安全保存。',
 	'auth.removed': 'API Key 已移除。',
-	'auth.notConfigured': 'API Key 未配置，请在命令面板运行 "Command Code: 设置 API Key"。',
+	'auth.notConfigured': 'API Key 未配置，请在命令面板运行 "Command Code Go: 设置 API Key"。',
 
 	// Thinking Effort — short labels for model picker dropdown
 	'status.thinking': '思考模式',
@@ -56,9 +56,9 @@ const zh: Translations = {
 	'error.http.401.withCreateApiKeyLink':
 		'[{0}] API Key 错误，认证失败。请检查您的 API Key 是否正确。如果没有 API key，请前往 [Studio]({1}) 创建。',
 	'error.http.403':
-		'[{0}] 当前订阅计划不支持 API 访问。请升级到 GOAT 或更高级别（Provider 计划是按量计费）。',
+		'[{0}] Command Code Go 访问被拒绝。请运行 command-code login，并确认账户已启用 Go 计划。',
 	'error.http.403.withUpgradeLink':
-		'[{0}] 当前订阅计划不支持 API 访问。请升级到 GOAT 或更高级别（Provider 计划是按量计费）。查看 [套餐]({1})。',
+		'[{0}] Command Code Go 访问被拒绝。请运行 command-code login，并确认账户已启用 Go 计划。查看 [套餐]({1})。',
 	'error.http.422': '[{0}] 请求体参数错误（{1}）。请检查模型 ID、参数或 ZDR 设置。',
 	'error.http.429': '[{0}] 请求速率过高。请稍后重试。',
 	'error.http.500': '[{0}] 服务器内部故障。请稍后重试。',
@@ -66,25 +66,22 @@ const zh: Translations = {
 	'error.http.generic': '[{0}] 服务返回错误响应：{1}',
 	'error.action.createApiKey': '创建 API Key',
 	'error.action.viewPricing': '套餐详情',
-	'error.network.dns': '[{0}] DNS 解析失败。请检查网络连接、防火墙或代理设置，以及自定义 baseUrl。',
-	'error.network.unreachable':
-		'[{0}] 目标不可达或拒绝连接。请检查自定义 baseUrl、代理服务、网络连接或防火墙设置。',
+	'error.network.dns': '[{0}] DNS 解析失败。请检查网络连接、防火墙或代理设置。',
+	'error.network.unreachable': '[{0}] 目标不可达或拒绝连接。请检查代理服务、网络连接或防火墙设置。',
 	'error.network.interrupted': '[{0}] 连接被中断。请检查网络连接、防火墙或代理设置，或稍后重试。',
 	'error.network.timeout': '[{0}] 连接超时。请稍后重试，或检查网络连接、防火墙或代理设置。',
-	'error.network.tls': '[{0}] TLS/证书校验失败。请检查代理、证书配置或自定义 baseUrl。',
+	'error.network.tls': '[{0}] TLS/证书校验失败。请检查代理或证书配置。',
 	'error.network.aborted':
 		'[{0}] 请求已中止。如果不是主动取消，请检查网络连接或代理设置，或稍后重试。',
-	'error.network.protocol':
-		'[{0}] HTTP 连接或响应解析失败。请检查代理设置、自定义 baseUrl 或服务响应。',
-	'error.network.configuration': '[{0}] 请求配置无效。请检查自定义 baseUrl 或扩展设置。',
-	'error.network.generic':
-		'[{0}] 网络请求失败。请检查网络连接、防火墙或代理设置，以及自定义 baseUrl。',
+	'error.network.protocol': '[{0}] HTTP 连接或响应解析失败。请检查代理设置或服务响应。',
+	'error.network.configuration': '[{0}] 请求配置无效。请检查扩展设置。',
+	'error.network.generic': '[{0}] 网络请求失败。请检查网络连接、防火墙或代理设置。',
 	'error.unknown': 'Command Code 请求失败：{0}',
 
 	// Extension
-	'extension.activateFailed': 'Command Code 扩展激活失败，请查看日志。',
+	'extension.activateFailed': 'Command Code Go 扩展激活失败，请查看日志。',
 	'extension.welcomeFailed': '欢迎流程执行失败。',
-	'extension.deactivateFailed': '停用 Command Code 扩展时出错。',
+	'extension.deactivateFailed': '停用 Command Code Go 扩展时出错。',
 };
 
 const en: Translations = {
@@ -96,7 +93,7 @@ const en: Translations = {
 	'auth.saved': 'API key saved securely.',
 	'auth.removed': 'API key removed.',
 	'auth.notConfigured':
-		'API key not configured. Run "Command Code: Set API Key" from the command palette.',
+		'API key not configured. Run "Command Code Go: Set API Key" from the command palette.',
 
 	// Thinking Effort — short labels for model picker dropdown
 	'status.thinking': 'Thinking effort',
@@ -127,9 +124,9 @@ const en: Translations = {
 	'error.http.401.withCreateApiKeyLink':
 		"[{0}] Authentication failed. Check your Command Code API key. Create one in [Studio]({1}) if you don't have one yet.",
 	'error.http.403':
-		'[{0}] Your plan does not include API access. Upgrade to GOAT or higher (the Provider plan is pay-as-you-go).',
+		'[{0}] Command Code Go access was denied. Run command-code login and verify that your account has the Go plan.',
 	'error.http.403.withUpgradeLink':
-		'[{0}] Your plan does not include API access. Upgrade to GOAT or higher. See [pricing]({1}).',
+		'[{0}] Command Code Go access was denied. Run command-code login and verify that your account has the Go plan. See [plans]({1}).',
 	'error.http.422':
 		'[{0}] Invalid request parameters ({1}). Check the model ID, parameters, or ZDR setting.',
 	'error.http.429': '[{0}] Rate limit exceeded. Try again in a moment.',
@@ -138,30 +135,28 @@ const en: Translations = {
 	'error.http.generic': '[{0}] The service returned an error: {1}',
 	'error.action.createApiKey': 'Create API key',
 	'error.action.viewPricing': 'Pricing',
-	'error.network.dns':
-		'[{0}] DNS lookup failed. Check your network, firewall, proxy, and the custom baseUrl.',
+	'error.network.dns': '[{0}] DNS lookup failed. Check your network, firewall, and proxy.',
 	'error.network.unreachable':
-		'[{0}] The endpoint is unreachable or refused the connection. Check the custom baseUrl, proxy, network, and firewall.',
+		'[{0}] The endpoint is unreachable or refused the connection. Check your proxy, network, and firewall.',
 	'error.network.interrupted':
 		'[{0}] The connection was interrupted. Check your network, firewall, or proxy, or retry shortly.',
 	'error.network.timeout':
 		'[{0}] The connection timed out. Retry shortly, or check your network, firewall, and proxy.',
 	'error.network.tls':
-		'[{0}] TLS / certificate validation failed. Check your proxy, certificates, and custom baseUrl.',
+		'[{0}] TLS / certificate validation failed. Check your proxy and certificates.',
 	'error.network.aborted':
 		'[{0}] Request aborted. If you did not cancel it, check your network or proxy, or retry shortly.',
 	'error.network.protocol':
-		'[{0}] HTTP connection or response parsing failed. Check your proxy, custom baseUrl, or the service response.',
+		'[{0}] HTTP connection or response parsing failed. Check your proxy or the service response.',
 	'error.network.configuration':
-		'[{0}] Invalid request configuration. Check the custom baseUrl and extension settings.',
-	'error.network.generic':
-		'[{0}] Network request failed. Check your network, firewall, or proxy, and the custom baseUrl.',
+		'[{0}] Invalid request configuration. Check the extension settings.',
+	'error.network.generic': '[{0}] Network request failed. Check your network, firewall, and proxy.',
 	'error.unknown': 'Command Code request failed: {0}',
 
 	// Extension
-	'extension.activateFailed': 'Command Code extension failed to activate; see logs for details.',
+	'extension.activateFailed': 'Command Code Go extension failed to activate; see logs for details.',
 	'extension.welcomeFailed': 'Welcome walkthrough failed.',
-	'extension.deactivateFailed': 'Failed to deactivate Command Code extension cleanly.',
+	'extension.deactivateFailed': 'Failed to deactivate Command Code Go extension cleanly.',
 };
 
 export function t(key: string, ...args: unknown[]): string {

@@ -9,12 +9,14 @@ tsconfig.json
 .github/**
 .gitignore
 .nvmrc
-.oxlintrc.json
 .oxfmtrc.json
 *.vsix
 .vscode-test/
 dist/**
 package-lock.json
+bun.lock
+eslint.config.mjs
+example.jsonl
 .DS_Store
 .env*
 !.env.example

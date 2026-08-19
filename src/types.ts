@@ -1,5 +1,5 @@
 /**
- * Shared types for the Command Code Copilot extension.
+ * Shared types for the Command Code Go for vscode extension.
  */
 
 // ---- API request/response types ----
@@ -61,46 +61,55 @@ export interface ChatUsage {
 	prompt_cache_miss_tokens?: number;
 }
 
-export interface ChatRequest {
-	model: string;
-	messages: ChatMessage[];
-	stream: boolean;
-	temperature?: number;
-	top_p?: number;
-	max_tokens?: number;
-	tools?: ChatTool[];
-	tool_choice?: 'none' | 'auto' | 'required';
-	/** Provider-specific reasoning knobs (only attached when thinking is enabled). */
-	reasoning_effort?: ReasoningEffort;
-	stream_options?: {
-		include_usage: boolean;
-	};
+/** Workspace and Git metadata required by the Command Code generate endpoint. */
+export interface CommandCodeRequestConfig {
+	workingDir: string;
+	date: string;
+	environment: 'cli';
+	structure: unknown[];
+	isGitRepo: boolean;
+	currentBranch: string;
+	mainBranch: string;
+	gitStatus: string;
+	recentCommits: string[];
 }
 
-export interface ChatStreamChunk {
-	id: string;
-	object: string;
-	created: number;
+/** A message encoded in the `params.messages` format used by `/alpha/generate`. */
+export interface CommandCodeGenerateMessage {
+	role: ChatRole;
+	content: ChatMessagePart[];
+	tool_call_id?: string;
+	tool_calls?: ChatToolCall[];
+	reasoning_content?: string;
+}
+
+/** Parameters accepted by the Command Code generate endpoint. */
+export interface CommandCodeGenerateParams {
 	model: string;
-	choices: Array<{
-		index: number;
-		delta: {
-			role?: string;
-			content?: string;
-			reasoning_content?: string;
-			tool_calls?: Array<{
-				index: number;
-				id?: string;
-				type?: string;
-				function?: {
-					name?: string;
-					arguments?: string;
-				};
-			}>;
-		};
-		finish_reason: string | null;
-	}>;
-	usage?: ChatUsage;
+	messages: CommandCodeGenerateMessage[];
+	tools: ChatTool[];
+	system: string;
+	max_tokens: number;
+	temperature: number;
+	stream: true;
+	tool_choice?: 'none' | 'auto' | 'required';
+	reasoning_effort?: ReasoningEffort;
+}
+
+/**
+ * Request envelope used by `POST /alpha/generate`.
+ *
+ * `memory`, `taste`, and `skills` are deliberately empty for the VS Code
+ * integration. Command Code's CLI owns those values; VS Code already sends
+ * its chat context as `params.messages`.
+ */
+export interface ChatRequest {
+	config: CommandCodeRequestConfig;
+	memory: '';
+	taste: '';
+	skills: '';
+	params: CommandCodeGenerateParams;
+	threadId: string;
 }
 
 // ---- Stream callbacks ----
@@ -139,27 +148,4 @@ export interface ModelDefinition {
 	};
 	/** Optional category used to group models in logs/UI. */
 	category?: string;
-}
-
-export interface ApiModelInfo {
-	id: string;
-	owned_by?: string;
-	/**
-	 * Capability hints derived from the model registry. The upstream `/models`
-	 * response is not yet guaranteed to include this — we infer it when known.
-	 */
-	capabilities?: {
-		toolCalling?: boolean | number;
-		imageInput?: boolean;
-		thinking?: ThinkingCapability | false;
-	};
-}
-
-/**
- * Raw shape returned by `GET /provider/v1/models`. We only consume `data`,
- * but keep the envelope so future fields (e.g. pagination) can be added
- * without changing the parser signature.
- */
-export interface ApiModelsResponse {
-	data?: ApiModelInfo[];
 }

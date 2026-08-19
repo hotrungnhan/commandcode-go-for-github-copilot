@@ -1,5 +1,6 @@
 import vscode from 'vscode';
 import { AuthManager } from '../auth';
+import { VENDOR_ID } from '../consts';
 import { t } from '../i18n';
 import { logger } from '../logger';
 import { MODELS } from '../models';
@@ -8,11 +9,11 @@ import { prepareChatRequest } from './request';
 import { streamChatCompletion } from './stream';
 import { estimateTokenCount } from './tokens';
 
-const PROVIDER_VENDOR = 'commandcode';
+const PROVIDER_VENDOR = VENDOR_ID;
 
 /**
- * Command Code Chat Provider — implements `vscode.LanguageModelChatProvider`
- * so Command Code Provider models appear directly in the Copilot Chat
+ * Command Code Go Chat Provider — implements `vscode.LanguageModelChatProvider`
+ * so Command Code Go models appear directly in the Copilot Chat
  * model picker.
  */
 export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider {
@@ -35,15 +36,9 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 
 		context.subscriptions.push(
 			this.onDidChangeLanguageModelChatInformationEmitter,
-			// Settings-based API key + base URL changes.
+			// The API key may be stored in settings or SecretStorage.
 			vscode.workspace.onDidChangeConfiguration((e) => {
-				if (
-					e.affectsConfiguration('commandcode-copilot.apiKey') ||
-					e.affectsConfiguration('commandcode-copilot.baseUrl') ||
-					e.affectsConfiguration('commandcode-copilot.modelBlacklist') ||
-					e.affectsConfiguration('commandcode-copilot.modelIdOverrides') ||
-					e.affectsConfiguration('commandcode-copilot.maxContextTokens')
-				) {
+				if (e.affectsConfiguration('commandcode-copilot.apiKey')) {
 					this.refreshModelPicker();
 				}
 			}),
@@ -87,7 +82,7 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 		// Trigger one final sync pull so the picker drops our entries immediately
 		// instead of waiting for the host to invalidate its cache. With
 		// `isActive = false` we return [], which makes Copilot Chat drop
-		// Command Code models from the picker immediately on deactivate.
+		// Command Code Go models from the picker immediately on deactivate.
 		try {
 			await vscode.lm.selectChatModels({ vendor: PROVIDER_VENDOR });
 		} catch (error) {
@@ -106,9 +101,7 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 		}
 
 		const hasKey = await this.authManager.hasApiKey();
-		const { getModelBlacklist } = await import('../config');
-		const blacklist = new Set(getModelBlacklist());
-		return MODELS.filter((m) => !blacklist.has(m.id)).map((m) => toChatInfo(m, hasKey));
+		return MODELS.map((m) => toChatInfo(m, hasKey));
 	}
 
 	async provideLanguageModelChatResponse(

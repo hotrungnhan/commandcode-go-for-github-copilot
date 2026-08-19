@@ -16,11 +16,14 @@ const THINKING: ThinkingCapability = {
 const NO_THINKING = false;
 
 /**
- * Compile-time model registry. Mirrors the catalog exposed by Command Code.
+ * Compile-time model registry for the models available on Command Code Go.
+ *
+ * This is intentionally an allowlist rather than a copy of every upstream
+ * model. Keep entries here aligned with the Go plan catalog so unsupported
+ * models never appear in Copilot Chat's picker.
  *
  * Each entry uses the upstream `vendor/name` slug from `cmdc --list-models`
- * as the model id. Copilot Chat receives the same id; users who route
- * through a custom base URL can remap them via `modelIdOverrides`.
+ * as the model id, which is sent unchanged to the Generate API.
  *
  * Vision-capable models are flagged with `imageInput: true`. Tool calling
  * is assumed to be supported for every model — adjust per-entry if a
@@ -107,85 +110,6 @@ export const MODELS: ModelDefinition[] = [
 		category: 'Alibaba',
 	},
 
-	// ---- Anthropic ----
-	{
-		id: 'claude-fable-5',
-		name: 'Claude Fable 5',
-		family: FAMILY,
-		version: 'fable-5',
-		detail: 'most capable for demanding reasoning & long-horizon agents',
-		maxInputTokens: 200000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Anthropic',
-	},
-	{
-		id: 'claude-haiku-4-5',
-		name: 'Claude Haiku 4.5',
-		family: FAMILY,
-		version: 'haiku-4-5',
-		detail: 'fastest & most compact, great for quick tasks',
-		maxInputTokens: 200000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: NO_THINKING },
-		category: 'Anthropic',
-	},
-	{
-		id: 'claude-opus-4-7',
-		name: 'Claude Opus 4.7',
-		family: FAMILY,
-		version: 'opus-4-7',
-		detail: 'older Opus, still strong for agents and coding',
-		maxInputTokens: 200000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Anthropic',
-	},
-	{
-		id: 'claude-opus-4-8',
-		name: 'Claude Opus 4.8',
-		family: FAMILY,
-		version: 'opus-4-8',
-		detail: 'prev flagship, still strong for agents and coding',
-		maxInputTokens: 200000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Anthropic',
-	},
-	{
-		id: 'claude-opus-5',
-		name: 'Claude Opus 5',
-		family: FAMILY,
-		version: 'opus-5',
-		detail: 'most intelligent Opus for agents and coding',
-		maxInputTokens: 200000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Anthropic',
-	},
-	{
-		id: 'claude-sonnet-4-6',
-		name: 'Claude Sonnet 4.6',
-		family: FAMILY,
-		version: 'sonnet-4-6',
-		detail: 'prev Sonnet, still fast & capable',
-		maxInputTokens: 200000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: NO_THINKING },
-		category: 'Anthropic',
-	},
-	{
-		id: 'claude-sonnet-5',
-		name: 'Claude Sonnet 5',
-		family: FAMILY,
-		version: 'sonnet-5',
-		detail: 'best combo of speed & intelligence (recommended)',
-		maxInputTokens: 200000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Anthropic',
-	},
-
 	// ---- DeepSeek ----
 	{
 		id: 'deepseek/deepseek-v4-flash',
@@ -210,86 +134,7 @@ export const MODELS: ModelDefinition[] = [
 		category: 'DeepSeek',
 	},
 
-	// ---- Google ----
-	{
-		id: 'google/gemini-3.1-flash-lite',
-		name: 'Gemini 3.1 Flash Lite',
-		family: FAMILY,
-		version: '3.1',
-		detail: 'high-volume workhorse model with implicit caching',
-		maxInputTokens: 1000000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Google',
-	},
-	{
-		id: 'google/gemini-3.5-flash',
-		name: 'Gemini 3.5 Flash',
-		family: FAMILY,
-		version: '3.5',
-		detail: 'Pro-level coding proficiency, parallel agentic execution',
-		maxInputTokens: 1000000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Google',
-	},
-	{
-		id: 'google/gemini-3.5-flash-lite',
-		name: 'Gemini 3.5 Flash Lite',
-		family: FAMILY,
-		version: '3.5',
-		detail: 'upgraded agentic capabilities, ideal for subagents',
-		maxInputTokens: 1000000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Google',
-	},
-	{
-		id: 'google/gemini-3.6-flash',
-		name: 'Gemini 3.6 Flash',
-		family: FAMILY,
-		version: '3.6',
-		detail: 'previous Gemini Flash, still fast & capable',
-		maxInputTokens: 1000000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Google',
-	},
-	{
-		id: 'google/gemini-3.7-flash',
-		name: 'Gemini 3.7 Flash',
-		family: FAMILY,
-		version: '3.7',
-		detail: 'higher-quality coding & agentic workflows, fewer tokens',
-		maxInputTokens: 1000000,
-		maxOutputTokens: 64000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Google',
-	},
-
 	// ---- Meta ----
-	{
-		id: 'meta/muse-spark-1.1',
-		name: 'Muse Spark 1.1',
-		family: FAMILY,
-		version: '1.1',
-		detail: 'agentic performance, tool use, and computer use',
-		maxInputTokens: 128000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Meta',
-	},
-	{
-		id: 'meta/muse-spark-1.2',
-		name: 'Muse Spark 1.2',
-		family: FAMILY,
-		version: '1.2',
-		detail: 'coding-optimized for agentic workflows and large codebases',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Meta',
-	},
 	{
 		id: 'meta/muse-spark-1.2-contributor',
 		name: 'Muse Spark 1.2 Contributor',
@@ -409,50 +254,6 @@ export const MODELS: ModelDefinition[] = [
 
 	// ---- OpenAI ----
 	{
-		id: 'gpt-5.3-codex',
-		name: 'GPT-5.3 Codex',
-		family: FAMILY,
-		version: '5.3',
-		detail: 'frontier coding model',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'OpenAI',
-	},
-	{
-		id: 'gpt-5.4',
-		name: 'GPT-5.4',
-		family: FAMILY,
-		version: '5.4',
-		detail: 'frontier model for general complex work',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'OpenAI',
-	},
-	{
-		id: 'gpt-5.4-mini',
-		name: 'GPT-5.4 Mini',
-		family: FAMILY,
-		version: '5.4',
-		detail: 'fast, cost-effective model for everyday tasks',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'OpenAI',
-	},
-	{
-		id: 'gpt-5.5',
-		name: 'GPT-5.5',
-		family: FAMILY,
-		version: '5.5',
-		detail: 'latest frontier model for general complex work',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'OpenAI',
-	},
-	{
 		id: 'gpt-5.6-luna',
 		name: 'GPT-5.6 Luna',
 		family: FAMILY,
@@ -463,29 +264,6 @@ export const MODELS: ModelDefinition[] = [
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'OpenAI',
 	},
-	{
-		id: 'gpt-5.6-sol',
-		name: 'GPT-5.6 Sol',
-		family: FAMILY,
-		version: '5.6',
-		detail: 'frontier model for complex professional work',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'OpenAI',
-	},
-	{
-		id: 'gpt-5.6-terra',
-		name: 'GPT-5.6 Terra',
-		family: FAMILY,
-		version: '5.6',
-		detail: 'balances intelligence and cost',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'OpenAI',
-	},
-
 	// ---- Poolside ----
 	{
 		id: 'poolside/laguna-s-2.1-free',
@@ -497,19 +275,6 @@ export const MODELS: ModelDefinition[] = [
 		maxOutputTokens: 32000,
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
 		category: 'Poolside',
-	},
-
-	// ---- Sakana AI ----
-	{
-		id: 'sakana/fugu-ultra',
-		name: 'Fugu Ultra',
-		family: FAMILY,
-		version: 'ultra',
-		detail: 'multi-agent orchestration across frontier models',
-		maxInputTokens: 128000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
-		category: 'Sakana AI',
 	},
 
 	// ---- StepFun ----
@@ -585,18 +350,6 @@ export const MODELS: ModelDefinition[] = [
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'xAI',
 	},
-	{
-		id: 'xai/grok-4.6',
-		name: 'Grok 4.6',
-		family: FAMILY,
-		version: '4.6',
-		detail: 'frontier performance on coding, knowledge work, and STEM',
-		maxInputTokens: 256000,
-		maxOutputTokens: 32000,
-		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
-		category: 'xAI',
-	},
-
 	// ---- Xiaomi ----
 	{
 		id: 'xiaomi/mimo-v2.5',

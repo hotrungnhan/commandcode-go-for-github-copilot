@@ -225,7 +225,7 @@ function extractServerCode(responseText: string): string | undefined {
 }
 
 function getRequestDiagnosticMessage(context: RequestErrorContext): string {
-	const model = context.request?.model;
+	const model = context.request?.params.model;
 	return model ? `model=${model}` : 'model=<not-yet-built>';
 }
 

@@ -1,18 +1,18 @@
 {
-    "name": "commandcode-copilot-provider",
-    "displayName": "Command Code for Copilot Chat",
-    "description": "Pick Command Code models from the Copilot Chat model picker. Vision, thinking mode, agent tools — zero config, BYOK.",
+    "name": "command-code-go-for-github-copilot",
+    "displayName": "Command Code Go for VS Code",
+    "description": "Use Command Code Go models in the GitHub Copilot Chat model picker for vscode. Vision, thinking mode, agent tools — BYOK.",
     "icon": "resources/icon.png",
     "version": "0.1.1",
-    "publisher": "Tyrannmisu",
+    "publisher": "hotrungnhan",
+    "author": "Ho Trung Nhan",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Tyrannmisu/commandcode-copilot-provider"
+        "url": "https://github.com/hotrungnhan/commandcode-go-for-github-copilot"
     },
     "engines": {
-        "vscode": "^1.116.0",
-        "node": ">=24"
+        "vscode": "^1.116.0"
     },
     "categories": [
         "AI",
@@ -21,7 +21,9 @@
     ],
     "keywords": [
         "commandcode",
+        "command code go",
         "command code",
+        "vscode",
         "copilot",
         "github copilot",
         "copilot chat",
@@ -42,7 +44,7 @@
         "languageModelChatProviders": [
             {
                 "vendor": "commandcode",
-                "displayName": "Command Code"
+                "displayName": "Command Code Go"
             }
         ],
         "commands": [
@@ -110,11 +112,6 @@
         "configuration": {
             "title": "%commandcode-copilot.config.title%",
             "properties": {
-                "commandcode-copilot.baseUrl": {
-                    "type": "string",
-                    "default": "https://api.commandcode.ai/provider/v1",
-                    "description": "%commandcode-copilot.config.baseUrl.description%"
-                },
                 "commandcode-copilot.maxTokens": {
                     "type": "number",
                     "default": 0,
@@ -129,25 +126,6 @@
                 "commandcode-copilot.apiKey": {
                     "type": "string",
                     "description": "%commandcode-copilot.config.apiKey.description%"
-                },
-                "commandcode-copilot.modelIdOverrides": {
-                    "type": "object",
-                    "default": {},
-                    "description": "%commandcode-copilot.config.modelIdOverrides.description%"
-                },
-                "commandcode-copilot.modelBlacklist": {
-                    "type": "array",
-                    "default": [],
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "%commandcode-copilot.config.modelBlacklist.description%"
-                },
-                "commandcode-copilot.maxContextTokens": {
-                    "type": "number",
-                    "default": 0,
-                    "minimum": 0,
-                    "description": "%commandcode-copilot.config.maxContextTokens.description%"
                 },
                 "commandcode-copilot.debugMode": {
                     "type": "string",
@@ -172,22 +150,24 @@
             }
         }
     },
+    "packageManager": "bun@1.3.14",
     "scripts": {
-        "clean": "node -e \"require('node:fs').rmSync('out', { recursive: true, force: true, maxRetries: process.platform === 'win32' ? 10 : 0 })\"",
-        "vscode:prepublish": "npm run compile",
-        "compile": "npm run clean && tsc -p ./",
-        "watch": "npm run clean && tsc -watch -p ./",
-        "lint": "oxlint",
-        "format": "oxfmt --write src/",
-        "format:check": "oxfmt --check src/",
-        "package": "vsce package -o dist/"
+        "clean": "bun -e \"require('fs').rmSync('out', { recursive: true, force: true, maxRetries: process.platform === 'win32' ? 10 : 0 })\"",
+        "compile": "bun run clean && bunx tsc -p ./",
+        "watch": "bun run clean && bunx tsc -watch -p ./",
+        "lint": "bunx eslint \"src/**/*.ts\"",
+        "format": "bunx oxfmt --write src/",
+        "format:check": "bunx oxfmt --check src/",
+        "package": "bun run compile && mkdir -p dist && bunx vsce package --no-dependencies -o dist/command-code-go-for-github-copilot.vsix"
     },
     "devDependencies": {
         "@types/node": "^25.6.0",
         "@types/vscode": "^1.116.0",
+        "@typescript-eslint/eslint-plugin": "^8.67.0",
+        "@typescript-eslint/parser": "^8.67.0",
         "@vscode/vsce": "^3.9.1",
+        "eslint": "^10.8.1",
         "oxfmt": "^0.47.0",
-        "oxlint": "^1.62.0",
         "typescript": "^6.0.3"
     }
 }

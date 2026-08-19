@@ -1,6 +1,12 @@
 import vscode from 'vscode';
 import { safeStringify } from '../json';
-import type { ChatMessage, ChatMessagePart, ChatTool, ChatToolCall } from '../types';
+import type {
+	ChatMessage,
+	ChatMessagePart,
+	ChatTool,
+	ChatToolCall,
+	CommandCodeGenerateMessage,
+} from '../types';
 
 /**
  * Convert VS Code chat messages to OpenAI-compatible format. Images are
@@ -63,7 +69,7 @@ export function convertMessages(
 		const text = textSegments.join('');
 
 		if (role === 'assistant') {
-			if (text || toolCalls.length > 0) {
+			if (text || thinkingContent || toolCalls.length > 0) {
 				const msg: ChatMessage = {
 					role: 'assistant',
 					content: text,
@@ -167,13 +173,29 @@ export function convertTools(
 }
 
 /**
+ * Turn the OpenAI-shaped intermediate messages into the content-part format
+ * required by Command Code's `/alpha/generate` endpoint.
+ */
+export function toGenerateMessages(messages: ChatMessage[]): CommandCodeGenerateMessage[] {
+	return messages.map((message) => ({
+		role: message.role,
+		content:
+			message.parts && message.parts.length > 0
+				? message.parts
+				: [{ type: 'text', text: message.content }],
+		...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {}),
+		...(message.tool_calls ? { tool_calls: message.tool_calls } : {}),
+		...(message.reasoning_content ? { reasoning_content: message.reasoning_content } : {}),
+	}));
+}
+
+/**
  * Sum character counts across all messages so we can calibrate the
  * chars-per-token ratio when usage stats are reported back from the API.
  */
 export function countMessageChars(messages: ChatMessage[]): number {
 	let total = 0;
 	for (const msg of messages) {
-		total += msg.content?.length ?? 0;
 		total += msg.reasoning_content?.length ?? 0;
 		if (msg.parts) {
 			for (const part of msg.parts) {
@@ -181,6 +203,8 @@ export function countMessageChars(messages: ChatMessage[]): number {
 					total += part.text.length;
 				}
 			}
+		} else {
+			total += msg.content?.length ?? 0;
 		}
 		if (msg.tool_calls) {
 			for (const tc of msg.tool_calls) {
