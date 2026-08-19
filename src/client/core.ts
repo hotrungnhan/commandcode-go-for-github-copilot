@@ -112,6 +112,7 @@ export class CommandCodeClient {
 		let protocol: 'sse' | 'jsonl' | undefined;
 		let doneNotified = false;
 		const pendingToolCalls = new Map<string, ChatToolCall>();
+		const completedToolCallIds = new Set<string>();
 
 		const finish = () => {
 			if (doneNotified) {
@@ -141,7 +142,7 @@ export class CommandCodeClient {
 				}
 				return;
 			}
-			const usage = handleGenerateEvent(event, callbacks, pendingToolCalls);
+			const usage = handleGenerateEvent(event, callbacks, pendingToolCalls, completedToolCallIds);
 			if (usage) {
 				latestUsage = usage;
 			}
@@ -251,6 +252,7 @@ function handleGenerateEvent(
 	event: GenerateStreamEvent,
 	callbacks: StreamCallbacks,
 	pendingToolCalls: Map<string, ChatToolCall>,
+	completedToolCallIds: Set<string>,
 ): ChatUsage | undefined {
 	switch (event.type) {
 		case 'reasoning-delta':
@@ -264,33 +266,21 @@ function handleGenerateEvent(
 			}
 			break;
 		case 'tool-input-start':
-			if (event.toolCallId && event.toolName) {
-				pendingToolCalls.set(event.toolCallId, {
-					id: event.toolCallId,
-					type: 'function',
-					function: { name: event.toolName, arguments: '' },
-				});
-			}
+			startToolCall(event, pendingToolCalls, completedToolCallIds);
 			break;
 		case 'tool-input-delta': {
-			const call = event.toolCallId ? pendingToolCalls.get(event.toolCallId) : undefined;
-			if (call && event.delta) {
-				call.function.arguments += event.delta;
-			}
+			appendToolCallArguments(event, pendingToolCalls, completedToolCallIds);
 			break;
 		}
+		case 'tool-call':
 		case 'tool-input-available':
-			if (event.toolCallId && event.toolName) {
-				const call = pendingToolCalls.get(event.toolCallId) ?? {
-					id: event.toolCallId,
-					type: 'function' as const,
-					function: { name: event.toolName, arguments: '' },
-				};
-				call.function.arguments =
-					typeof event.input === 'string' ? event.input : safeStringify(event.input ?? {});
-				pendingToolCalls.delete(event.toolCallId);
-				callbacks.onToolCall(call);
-			}
+			completeToolCall(event, callbacks, pendingToolCalls, completedToolCallIds);
+			break;
+		case 'tool-use':
+			startToolCall(event, pendingToolCalls, completedToolCallIds);
+			break;
+		case 'tool-delta':
+			appendToolCallArguments(event, pendingToolCalls, completedToolCallIds);
 			break;
 		case 'error':
 			throw new Error(getGenerateErrorMessage(event));
@@ -303,6 +293,99 @@ function handleGenerateEvent(
 	}
 
 	return undefined;
+}
+
+/**
+ * Command Code's incremental events use `id`; only the final `tool-call`
+ * event uses `toolCallId`. Supporting both also keeps the client compatible
+ * with older data-stream event names.
+ */
+function getToolCallId(event: GenerateStreamEvent): string | undefined {
+	return event.toolCallId ?? event.id;
+}
+
+function startToolCall(
+	event: GenerateStreamEvent,
+	pendingToolCalls: Map<string, ChatToolCall>,
+	completedToolCallIds: Set<string>,
+): void {
+	const toolCallId = getToolCallId(event);
+	if (!toolCallId || completedToolCallIds.has(toolCallId)) {
+		return;
+	}
+
+	const call = pendingToolCalls.get(toolCallId);
+	if (call) {
+		if (event.toolName) {
+			call.function.name = event.toolName;
+		}
+		return;
+	}
+
+	if (event.toolName) {
+		pendingToolCalls.set(toolCallId, {
+			id: toolCallId,
+			type: 'function',
+			function: { name: event.toolName, arguments: '' },
+		});
+	}
+}
+
+function appendToolCallArguments(
+	event: GenerateStreamEvent,
+	pendingToolCalls: Map<string, ChatToolCall>,
+	completedToolCallIds: Set<string>,
+): void {
+	const toolCallId = getToolCallId(event);
+	const call = toolCallId ? pendingToolCalls.get(toolCallId) : getLatestToolCall(pendingToolCalls);
+	if (!call || completedToolCallIds.has(call.id)) {
+		return;
+	}
+
+	const argumentsDelta = event.delta ?? event.text;
+	if (argumentsDelta) {
+		call.function.arguments += argumentsDelta;
+	}
+}
+
+function getLatestToolCall(pendingToolCalls: Map<string, ChatToolCall>): ChatToolCall | undefined {
+	let latest: ChatToolCall | undefined;
+	for (const call of pendingToolCalls.values()) {
+		latest = call;
+	}
+	return latest;
+}
+
+function completeToolCall(
+	event: GenerateStreamEvent,
+	callbacks: StreamCallbacks,
+	pendingToolCalls: Map<string, ChatToolCall>,
+	completedToolCallIds: Set<string>,
+): void {
+	const toolCallId = getToolCallId(event);
+	if (!toolCallId || completedToolCallIds.has(toolCallId)) {
+		return;
+	}
+
+	const call = pendingToolCalls.get(toolCallId) ?? {
+		id: toolCallId,
+		type: 'function' as const,
+		function: { name: '', arguments: '' },
+	};
+	if (event.toolName) {
+		call.function.name = event.toolName;
+	}
+	if (!call.function.name) {
+		return;
+	}
+	if (event.input !== undefined) {
+		call.function.arguments =
+			typeof event.input === 'string' ? event.input : safeStringify(event.input);
+	}
+
+	pendingToolCalls.delete(toolCallId);
+	completedToolCallIds.add(toolCallId);
+	callbacks.onToolCall(call);
 }
 
 function detectStreamProtocol(buffer: string): 'sse' | 'jsonl' | undefined {

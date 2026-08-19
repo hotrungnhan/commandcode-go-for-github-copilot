@@ -10,6 +10,7 @@ import {
 	convertMessages,
 	convertTools,
 	countMessageChars,
+	extractSystemMessages,
 	toGenerateMessages,
 	toGenerateTools,
 } from './convert';
@@ -57,11 +58,12 @@ export async function prepareChatRequest({
 	const imageInput = Boolean(modelDefinition?.capabilities.imageInput);
 	const maxTokens = getMaxTokens();
 
-	const chatMessages = convertMessages(messages, { imageInput });
+	const convertedMessages = convertMessages(messages, { imageInput });
+	const { system, messages: chatMessages } = extractSystemMessages(convertedMessages);
 	const tools = prepareTools(modelDefinition?.capabilities.toolCalling, options);
 	const generateTools = toGenerateTools(tools);
 
-	const totalRequestChars = countMessageChars(chatMessages);
+	const totalRequestChars = countMessageChars(convertedMessages);
 	const thinkingEffort: 'none' | ReasoningEffort = thinkingCapability
 		? getConfiguredThinkingEffort(options as ModelConfigurationOptions, thinkingCapability)
 		: 'none';
@@ -75,7 +77,7 @@ export async function prepareChatRequest({
 			model: modelInfo.id,
 			messages: toGenerateMessages(chatMessages),
 			tools: generateTools ?? [],
-			system: '',
+			system,
 			max_tokens: maxTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
 			temperature: 0.3,
 			stream: true,

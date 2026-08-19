@@ -1,4 +1,5 @@
 import vscode from 'vscode';
+import { LANGUAGE_MODEL_CHAT_SYSTEM_ROLE } from '../consts';
 import { safeStringify } from '../json';
 import type {
 	ChatMessage,
@@ -101,10 +102,9 @@ export function convertMessages(
 					result.push({ role: 'user', content: text });
 				}
 			}
-		} else {
-			// system / unknown roles — pass through as text
+		} else if (role === 'system') {
 			if (text) {
-				result.push({ role: 'user', content: text });
+				result.push({ role: 'system', content: text });
 			}
 		}
 
@@ -143,15 +143,39 @@ function normalizeThinkingPartText(value: string | string[]): string {
 	return Array.isArray(value) ? value.join('') : value;
 }
 
-function mapRole(role: vscode.LanguageModelChatMessageRole): 'user' | 'assistant' {
+function mapRole(role: vscode.LanguageModelChatMessageRole): ChatMessage['role'] {
 	switch (role) {
 		case vscode.LanguageModelChatMessageRole.User:
 			return 'user';
 		case vscode.LanguageModelChatMessageRole.Assistant:
 			return 'assistant';
 		default:
-			return 'user';
+			return role === LANGUAGE_MODEL_CHAT_SYSTEM_ROLE ? 'system' : 'user';
 	}
+}
+
+/**
+ * `/alpha/generate` accepts system instructions separately from its Vercel AI
+ * SDK message array. Keep the remaining conversation in its original order.
+ */
+export function extractSystemMessages(messages: readonly ChatMessage[]): {
+	system: string;
+	messages: ChatMessage[];
+} {
+	const system: string[] = [];
+	const conversation: ChatMessage[] = [];
+
+	for (const message of messages) {
+		if (message.role === 'system') {
+			if (message.content) {
+				system.push(message.content);
+			}
+		} else {
+			conversation.push(message);
+		}
+	}
+
+	return { system: system.join('\n'), messages: conversation };
 }
 
 /**
