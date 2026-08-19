@@ -63,7 +63,7 @@ export class AuthManager {
 			password: true,
 			ignoreFocusOut: true,
 			validateInput: (value: string) => {
-				if (!value?.trim()) {
+				if (!value.trim()) {
 					return t('auth.emptyValidation');
 				}
 				return undefined;

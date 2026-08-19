@@ -2,6 +2,7 @@ import vscode from 'vscode';
 import { CONFIG_SECTION } from './consts';
 
 export type DebugMode = 'minimal' | 'metadata' | 'verbose';
+const DEBUG_MODES = ['minimal', 'metadata', 'verbose'] as const satisfies readonly DebugMode[];
 
 /**
  * Get the configured max output tokens limit.
@@ -24,8 +25,8 @@ export function getZdrEnabled(): boolean {
 export function getDebugMode(): DebugMode {
 	const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
 	const mode = config.get<string>('debugMode');
-	if (mode === 'minimal' || mode === 'metadata' || mode === 'verbose') {
-		return mode;
+	if (DEBUG_MODES.includes(mode as DebugMode)) {
+		return mode as DebugMode;
 	}
 	return 'minimal';
 }

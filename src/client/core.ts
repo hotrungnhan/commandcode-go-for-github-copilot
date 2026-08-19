@@ -66,7 +66,7 @@ export class CommandCodeClient {
 				throw new Error('No response body received');
 			}
 
-			await this.consumeStream(response.body, callbacks, request, cancellationToken, controller);
+			await this.consumeStream(response.body, callbacks, cancellationToken, controller);
 		} catch (error) {
 			if (isAbortError(error) && cancellationToken?.isCancellationRequested) {
 				return;
@@ -85,23 +85,19 @@ export class CommandCodeClient {
 	}
 
 	private buildHeaders(): Record<string, string> {
-		const headers: Record<string, string> = {
+		return {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${this.apiKey}`,
 			Accept: 'text/event-stream',
 			'x-command-code-version': COMMAND_CODE_CLIENT_VERSION,
 			'x-cli-environment': 'production',
+			...this.options.extraHeaders,
 		};
-		if (this.options.extraHeaders) {
-			Object.assign(headers, this.options.extraHeaders);
-		}
-		return headers;
 	}
 
 	private async consumeStream(
 		body: ReadableStream<Uint8Array>,
 		callbacks: StreamCallbacks,
-		request: ChatRequest,
 		cancellationToken: CancellationToken | undefined,
 		controller: AbortController,
 	): Promise<void> {
@@ -121,7 +117,7 @@ export class CommandCodeClient {
 			doneNotified = true;
 			flushToolCalls(pendingToolCalls, callbacks);
 			reportFinalUsage(callbacks, latestUsage);
-			callbacks.onDone();
+			callbacks.onDone?.();
 		};
 
 		const handlePayload = (payload: string) => {
@@ -151,63 +147,49 @@ export class CommandCodeClient {
 			}
 		};
 
-		try {
-			while (true) {
-				if (cancellationToken?.isCancellationRequested) {
-					controller.abort();
-					return;
-				}
+		while (true) {
+			if (cancellationToken?.isCancellationRequested) {
+				controller.abort();
+				return;
+			}
 
-				const { done, value } = await reader.read();
-				if (done) {
-					break;
-				}
+			const { done, value } = await reader.read();
+			if (done) {
+				break;
+			}
 
-				buffer += decoder.decode(value, { stream: true });
-				protocol ??= detectStreamProtocol(buffer);
+			buffer += decoder.decode(value, { stream: true });
+			protocol ??= detectStreamProtocol(buffer);
 
-				if (protocol === 'sse') {
-					const frames = buffer.split(/\r?\n\r?\n/u);
-					buffer = frames.pop() ?? '';
-					for (const frame of frames) {
-						for (const payload of getSsePayloads(frame)) {
-							handlePayload(payload);
-						}
-					}
-				} else if (protocol === 'jsonl') {
-					const result = takeJsonObjects(buffer);
-					buffer = result.remainder;
-					for (const payload of result.objects) {
+			if (protocol === 'sse') {
+				const frames = buffer.split(/\r?\n\r?\n/u);
+				buffer = frames.pop() ?? '';
+				for (const frame of frames) {
+					for (const payload of getSsePayloads(frame)) {
 						handlePayload(payload);
 					}
 				}
-			}
-
-			buffer += decoder.decode();
-			if (protocol === 'sse' && buffer.trim()) {
-				for (const payload of getSsePayloads(buffer)) {
-					handlePayload(payload);
-				}
-			} else if (protocol === 'jsonl' && buffer.trim()) {
+			} else if (protocol === 'jsonl') {
 				const result = takeJsonObjects(buffer);
+				buffer = result.remainder;
 				for (const payload of result.objects) {
 					handlePayload(payload);
 				}
 			}
-			finish();
-		} catch (error) {
-			if (isAbortError(error) && cancellationToken?.isCancellationRequested) {
-				return;
-			}
-			const normalized = normalizeRequestError(error, {
-				baseUrl: this.baseUrl,
-				request,
-			});
-			if (this.options.debug) {
-				logger.error('Command Code stream failed:', formatRequestError(normalized));
-			}
-			callbacks.onError(normalized);
 		}
+
+		buffer += decoder.decode();
+		if (protocol === 'sse' && buffer.trim()) {
+			for (const payload of getSsePayloads(buffer)) {
+				handlePayload(payload);
+			}
+		} else if (protocol === 'jsonl' && buffer.trim()) {
+			const result = takeJsonObjects(buffer);
+			for (const payload of result.objects) {
+				handlePayload(payload);
+			}
+		}
+		finish();
 	}
 }
 

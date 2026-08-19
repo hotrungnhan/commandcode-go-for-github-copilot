@@ -30,7 +30,7 @@ const NO_THINKING = false;
  * specific upstream omits it.
  */
 
-export const MODELS: ModelDefinition[] = [
+export const MODELS: readonly ModelDefinition[] = [
 	// ---- Alibaba ----
 	{
 		id: 'Qwen/Qwen3.6-Max-Preview',

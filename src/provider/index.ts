@@ -9,8 +9,6 @@ import { prepareChatRequest } from './request';
 import { streamChatCompletion } from './stream';
 import { estimateTokenCount } from './tokens';
 
-const PROVIDER_VENDOR = VENDOR_ID;
-
 /**
  * Command Code Go Chat Provider — implements `vscode.LanguageModelChatProvider`
  * so Command Code Go models appear directly in the Copilot Chat
@@ -20,7 +18,7 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 	private readonly authManager: AuthManager;
 	private readonly onDidChangeLanguageModelChatInformationEmitter = new vscode.EventEmitter<void>();
 	private isActive = true;
-	private modelById = new Map(MODELS.map((m) => [m.id, m]));
+	private readonly modelById = new Map(MODELS.map((m) => [m.id, m]));
 
 	readonly onDidChangeLanguageModelChatInformation =
 		this.onDidChangeLanguageModelChatInformationEmitter.event;
@@ -84,7 +82,7 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 		// `isActive = false` we return [], which makes Copilot Chat drop
 		// Command Code Go models from the picker immediately on deactivate.
 		try {
-			await vscode.lm.selectChatModels({ vendor: PROVIDER_VENDOR });
+			await vscode.lm.selectChatModels({ vendor: VENDOR_ID });
 		} catch (error) {
 			logger.warn('Failed to refresh Command Code models during deactivate', error);
 		}
@@ -119,7 +117,6 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 			modelDefinition,
 			messages,
 			options,
-			token,
 		});
 
 		return streamChatCompletion({
@@ -142,4 +139,4 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 	}
 }
 
-export { PROVIDER_VENDOR };
+export { VENDOR_ID as PROVIDER_VENDOR };

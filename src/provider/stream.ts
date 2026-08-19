@@ -21,64 +21,48 @@ export function streamChatCompletion({
 	getCharsPerToken,
 	setCharsPerToken,
 }: StreamChatCompletionOptions): Promise<void> {
-	const cancelListener = token.onCancellationRequested(() => {
-		// Cancellation is forwarded via the AbortController inside the client;
-		// we just keep a handle here so the subscription is disposed.
-	});
-
-	return prepared.client
-		.streamChatCompletion(
-			prepared.request,
-			{
-				onContent: (content: string) => {
-					progress.report(new vscode.LanguageModelTextPart(content));
-				},
-
-				onThinking: (text: string) => {
-					progress.report(
-						new vscode.LanguageModelThinkingPart(
-							text,
-						) as unknown as vscode.LanguageModelResponsePart,
-					);
-				},
-
-				onToolCall: (toolCall: ChatToolCall) => {
-					try {
-						const args = JSON.parse(toolCall.function.arguments);
-						progress.report(
-							new vscode.LanguageModelToolCallPart(toolCall.id, toolCall.function.name, args),
-						);
-					} catch {
-						progress.report(
-							new vscode.LanguageModelToolCallPart(toolCall.id, toolCall.function.name, {}),
-						);
-					}
-				},
-
-				onError: (error: Error) => {
-					throw createUserFacingError(error);
-				},
-
-				onDone: () => {
-					// Hook reserved for diagnostics. The client already finalised
-					// the stream before calling `onDone`, so nothing to do here.
-				},
-
-				onUsage: (usage: ChatUsage) => {
-					const charsPerToken = updateCharsPerToken(
-						prepared.totalRequestChars,
-						usage,
-						getCharsPerToken(),
-					);
-					setCharsPerToken(charsPerToken);
-					reportCopilotUsage(progress, usage);
-				},
+	return prepared.client.streamChatCompletion(
+		prepared.request,
+		{
+			onContent: (content: string) => {
+				progress.report(new vscode.LanguageModelTextPart(content));
 			},
-			token,
-		)
-		.finally(() => {
-			cancelListener.dispose();
-		});
+
+			onThinking: (text: string) => {
+				progress.report(
+					new vscode.LanguageModelThinkingPart(text) as unknown as vscode.LanguageModelResponsePart,
+				);
+			},
+
+			onToolCall: (toolCall: ChatToolCall) => {
+				try {
+					const args = JSON.parse(toolCall.function.arguments);
+					progress.report(
+						new vscode.LanguageModelToolCallPart(toolCall.id, toolCall.function.name, args),
+					);
+				} catch {
+					progress.report(
+						new vscode.LanguageModelToolCallPart(toolCall.id, toolCall.function.name, {}),
+					);
+				}
+			},
+
+			onError: (error: Error) => {
+				throw createUserFacingError(error);
+			},
+
+			onUsage: (usage: ChatUsage) => {
+				const charsPerToken = updateCharsPerToken(
+					prepared.totalRequestChars,
+					usage,
+					getCharsPerToken(),
+				);
+				setCharsPerToken(charsPerToken);
+				reportCopilotUsage(progress, usage);
+			},
+		},
+		token,
+	);
 }
 
 function updateCharsPerToken(

@@ -5,6 +5,7 @@ import { API_PROVIDER_HTTP_ERROR_LINKS, MAX_DIAGNOSTIC_FIELD_LENGTH } from '../c
 import { getNetworkErrorCauseInfo, getNetworkErrorCode, getNetworkErrorMessage } from './network';
 import type {
 	CommandCodeRequestErrorKind,
+	ErrorActionLabelKey,
 	ErrorActionLink,
 	ErrorActionUrls,
 	RequestErrorContext,
@@ -12,21 +13,18 @@ import type {
 
 export type { CommandCodeRequestErrorKind, ErrorActionUrls } from '../types';
 
-const errorActionUrlStore = (() => {
-	let current: ErrorActionUrls = {
-		createApiKey: EXTERNAL_URLS.commandcode.apiKeys,
-	};
+const ERROR_ACTION_KEYS: Record<ErrorActionLabelKey, keyof ErrorActionUrls> = {
+	'error.action.createApiKey': 'createApiKey',
+	'error.action.viewPricing': 'viewPricing',
+};
 
-	return {
-		get: () => current,
-		set: (key: keyof ErrorActionUrls, url: string) => {
-			current = { ...current, [key]: url };
-		},
-	};
-})();
+let errorActionUrls: ErrorActionUrls = {
+	createApiKey: EXTERNAL_URLS.commandcode.apiKeys,
+	viewPricing: EXTERNAL_URLS.commandcode.pricing,
+};
 
 export function setErrorActionUrl(key: keyof ErrorActionUrls, url: string): void {
-	errorActionUrlStore.set(key, url);
+	errorActionUrls = { ...errorActionUrls, [key]: url };
 }
 
 export class CommandCodeRequestError extends Error {
@@ -64,13 +62,9 @@ export async function createHttpError(
 ): Promise<CommandCodeRequestError> {
 	const { baseUrl } = context;
 	const responseText = await response.text();
-	const serverMessage = extractServerMessage(responseText);
-	const serverCode = extractServerCode(responseText);
-	const userSummary = getHttpErrorMessage(
-		response.status,
-		serverMessage,
-		errorActionUrlStore.get().createApiKey,
-	);
+	const { message: serverMessage, code: serverCode } = extractServerError(responseText);
+	const actionUrls = errorActionUrls;
+	const userSummary = getHttpErrorMessage(response.status, serverMessage, actionUrls);
 
 	return new CommandCodeRequestError({
 		message: `Command Code API request failed with HTTP ${response.status}`,
@@ -153,7 +147,7 @@ export function formatRequestError(error: Error): string {
 export function createUserFacingError(error: Error): Error {
 	const message =
 		error instanceof CommandCodeRequestError
-			? formatMarkdownMessage(error.userSummary, getErrorActions(error, errorActionUrlStore.get()))
+			? formatMarkdownMessage(error.userSummary, getErrorActions(error, errorActionUrls))
 			: error.message;
 	const displayError = new Error(message);
 	displayError.stack = undefined;
@@ -162,20 +156,20 @@ export function createUserFacingError(error: Error): Error {
 
 function getHttpErrorMessage(
 	status: number,
-	serverMessage?: string,
-	createApiKeyUrl?: string,
+	serverMessage: string | undefined,
+	actionUrls: ErrorActionUrls,
 ): string {
 	const detail = serverMessage ?? '';
 	switch (status) {
 		case 400:
 			return t('error.http.400', status, detail);
 		case 401:
-			return createApiKeyUrl
-				? t('error.http.401.withCreateApiKeyLink', status, createApiKeyUrl)
+			return actionUrls.createApiKey
+				? t('error.http.401.withCreateApiKeyLink', status, actionUrls.createApiKey)
 				: t('error.http.401', status);
 		case 403:
-			return createApiKeyUrl
-				? t('error.http.403.withUpgradeLink', status, createApiKeyUrl)
+			return actionUrls.viewPricing
+				? t('error.http.403.withUpgradeLink', status, actionUrls.viewPricing)
 				: t('error.http.403', status);
 		case 422:
 			return t('error.http.422', status, detail || 'cmd_zdr_no_providers');
@@ -190,10 +184,15 @@ function getHttpErrorMessage(
 	}
 }
 
-function extractServerMessage(responseText: string): string | undefined {
+interface ServerErrorDetails {
+	message?: string;
+	code?: string;
+}
+
+function extractServerError(responseText: string): ServerErrorDetails {
 	const trimmed = responseText.trim();
 	if (!trimmed) {
-		return undefined;
+		return {};
 	}
 
 	try {
@@ -203,24 +202,12 @@ function extractServerMessage(responseText: string): string | undefined {
 			getStringProperty(error, 'message') ??
 			getStringProperty(parsed, 'message') ??
 			(typeof error === 'string' ? error : undefined);
-		return message ? truncateSingleLine(message) : undefined;
+		return {
+			message: message ? truncateSingleLine(message) : undefined,
+			code: getStringProperty(error, 'code') ?? getStringProperty(error, 'type'),
+		};
 	} catch {
-		return truncateSingleLine(trimmed);
-	}
-}
-
-function extractServerCode(responseText: string): string | undefined {
-	const trimmed = responseText.trim();
-	if (!trimmed) {
-		return undefined;
-	}
-
-	try {
-		const parsed: unknown = JSON.parse(trimmed);
-		const error = getObjectProperty(parsed, 'error');
-		return getStringProperty(error, 'code') ?? getStringProperty(error, 'type');
-	} catch {
-		return undefined;
+		return { message: truncateSingleLine(trimmed) };
 	}
 }
 
@@ -253,7 +240,7 @@ function getErrorActions(error: CommandCodeRequestError, urls: ErrorActionUrls):
 		return [];
 	}
 
-	const url = urls[definition.labelKey.replace('error.action.', '') as keyof ErrorActionUrls];
+	const url = urls[ERROR_ACTION_KEYS[definition.labelKey]];
 	if (!url) {
 		return [];
 	}

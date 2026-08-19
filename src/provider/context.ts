@@ -55,7 +55,7 @@ export function getThreadId(options: vscode.ProvideLanguageModelChatResponseOpti
 		requestOptions.modelOptions?.chatThreadId,
 	]) {
 		if (typeof value === 'string' && value.trim()) {
-			return value;
+			return value.trim();
 		}
 	}
 

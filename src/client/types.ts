@@ -4,6 +4,7 @@ export interface ErrorActionUrls {
 	configureApiKey?: string;
 	showLogs?: string;
 	createApiKey?: string;
+	viewPricing?: string;
 }
 
 export interface RequestErrorContext {
@@ -12,12 +13,14 @@ export interface RequestErrorContext {
 }
 
 export interface ErrorActionLink {
-	labelKey: string;
+	labelKey: ErrorActionLabelKey;
 	url: string;
 }
 
+export type ErrorActionLabelKey = 'error.action.createApiKey' | 'error.action.viewPricing';
+
 export interface HttpErrorLinkDefinition {
-	labelKey: string;
+	labelKey: ErrorActionLabelKey;
 	url: string;
 }
 

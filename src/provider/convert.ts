@@ -11,6 +11,8 @@ import type {
 	CommandCodeGenerateMessage,
 } from '../types';
 
+const EMPTY_TOOL_SCHEMA = { type: 'object', properties: {} } as const;
+
 /**
  * Convert VS Code chat messages to OpenAI-compatible format. Images are
  * emitted as multimodal `content` arrays for vision-capable models and as
@@ -18,7 +20,7 @@ import type {
  */
 export function convertMessages(
 	messages: readonly vscode.LanguageModelChatRequestMessage[],
-	options: { imageInput: boolean },
+	options: Readonly<{ imageInput: boolean }>,
 ): ChatMessage[] {
 	const result: ChatMessage[] = [];
 
@@ -87,7 +89,7 @@ export function convertMessages(
 			}
 		} else if (role === 'user') {
 			if (text || imageSegments.length > 0) {
-				if (imageSegments.length > 0 && options.imageInput) {
+				if (imageSegments.length > 0) {
 					const parts: ChatMessagePart[] = [];
 					if (text) {
 						parts.push({ type: 'text', text });
@@ -184,7 +186,7 @@ export function extractSystemMessages(messages: readonly ChatMessage[]): {
 export function convertTools(
 	tools: readonly vscode.LanguageModelChatTool[] | undefined,
 ): ChatTool[] | undefined {
-	if (!tools || tools.length === 0) {
+	if (!tools?.length) {
 		return undefined;
 	}
 
@@ -206,14 +208,14 @@ export function convertTools(
 export function toGenerateTools(
 	tools: readonly ChatTool[] | undefined,
 ): CommandCodeTool[] | undefined {
-	if (!tools || tools.length === 0) {
+	if (!tools?.length) {
 		return undefined;
 	}
 
 	return tools.map((tool) => ({
 		name: tool.function.name,
 		description: tool.function.description ?? '',
-		input_schema: tool.function.parameters ?? { type: 'object', properties: {} },
+		input_schema: tool.function.parameters ?? EMPTY_TOOL_SCHEMA,
 	}));
 }
 
@@ -221,7 +223,7 @@ export function toGenerateTools(
  * Turn the OpenAI-shaped intermediate messages into the content-part format
  * required by Command Code's `/alpha/generate` endpoint.
  */
-export function toGenerateMessages(messages: ChatMessage[]): CommandCodeGenerateMessage[] {
+export function toGenerateMessages(messages: readonly ChatMessage[]): CommandCodeGenerateMessage[] {
 	const toolNames = new Map<string, string>();
 
 	return messages.map((message) => {
@@ -248,15 +250,14 @@ export function toGenerateMessages(messages: ChatMessage[]): CommandCodeGenerate
 		if (message.parts && message.parts.length > 0) {
 			for (const part of message.parts) {
 				if (part.type === 'image_url') {
-					const imageUrl = part.image_url?.url;
-					if (imageUrl) {
-						content.push({
-							type: 'image',
-							image: imageUrl,
-							...(getMediaType(imageUrl) ? { mimeType: getMediaType(imageUrl) } : {}),
-						});
-					}
-				} else if (part.text !== undefined) {
+					const imageUrl = part.image_url.url;
+					const mimeType = getMediaType(imageUrl);
+					content.push({
+						type: 'image',
+						image: imageUrl,
+						...(mimeType ? { mimeType } : {}),
+					});
+				} else {
 					content.push({ type: 'text', text: part.text });
 				}
 			}
@@ -301,23 +302,23 @@ function getMediaType(url: string): string | undefined {
  * Sum character counts across all messages so we can calibrate the
  * chars-per-token ratio when usage stats are reported back from the API.
  */
-export function countMessageChars(messages: ChatMessage[]): number {
+export function countMessageChars(messages: readonly ChatMessage[]): number {
 	let total = 0;
 	for (const msg of messages) {
 		total += msg.reasoning_content?.length ?? 0;
 		if (msg.parts) {
 			for (const part of msg.parts) {
-				if (part.text) {
+				if (part.type === 'text') {
 					total += part.text.length;
 				}
 			}
 		} else {
-			total += msg.content?.length ?? 0;
+			total += msg.content.length;
 		}
 		if (msg.tool_calls) {
 			for (const tc of msg.tool_calls) {
-				total += tc.function?.name?.length ?? 0;
-				total += tc.function?.arguments?.length ?? 0;
+				total += tc.function.name.length;
+				total += tc.function.arguments.length;
 			}
 		}
 	}

@@ -3,6 +3,18 @@ import { safeStringify } from '../../json';
 import { MAX_DIAGNOSTIC_FIELD_LENGTH, NETWORK_ERROR_CATEGORY_BY_CODE } from '../consts';
 import type { NetworkErrorCategory } from '../types';
 
+const NETWORK_ERROR_MESSAGE_KEYS = {
+	dns: 'error.network.dns',
+	unreachable: 'error.network.unreachable',
+	interrupted: 'error.network.interrupted',
+	timeout: 'error.network.timeout',
+	tls: 'error.network.tls',
+	aborted: 'error.network.aborted',
+	protocol: 'error.network.protocol',
+	configuration: 'error.network.configuration',
+	generic: 'error.network.generic',
+} as const satisfies Record<NetworkErrorCategory, string>;
+
 export interface NetworkErrorCauseInfo {
 	code?: string;
 	name?: string;
@@ -51,29 +63,8 @@ export function getNetworkErrorCode(info: NetworkErrorCauseInfo | undefined): st
 
 export function getNetworkErrorMessage(code: string | undefined): string {
 	const errorCode = code ?? 'UNKNOWN';
-
-	switch (getNetworkErrorCategory(code)) {
-		case 'dns':
-			return t('error.network.dns', errorCode);
-		case 'unreachable':
-			return t('error.network.unreachable', errorCode);
-		case 'interrupted':
-			return t('error.network.interrupted', errorCode);
-		case 'timeout':
-			return t('error.network.timeout', errorCode);
-		case 'tls':
-			return t('error.network.tls', errorCode);
-		case 'aborted':
-			return t('error.network.aborted', errorCode);
-		case 'protocol':
-			return t('error.network.protocol', errorCode);
-		case 'configuration':
-			return t('error.network.configuration', errorCode);
-		case 'generic':
-			return t('error.network.generic', errorCode);
-		default:
-			return t('error.network.generic', errorCode);
-	}
+	const category = getNetworkErrorCategory(code);
+	return t(NETWORK_ERROR_MESSAGE_KEYS[category], errorCode);
 }
 
 export function getNetworkErrorCategory(code: string | undefined): NetworkErrorCategory {

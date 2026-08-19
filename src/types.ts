@@ -29,11 +29,12 @@ export interface ChatMessage {
 	parts?: ChatMessagePart[];
 }
 
-export interface ChatMessagePart {
-	type: 'text' | 'image_url';
-	text?: string;
-	image_url?: { url: string; detail?: 'auto' | 'low' | 'high' };
-}
+export type ChatMessagePart =
+	| { type: 'text'; text: string }
+	| {
+			type: 'image_url';
+			image_url: { url: string; detail?: 'auto' | 'low' | 'high' };
+	  };
 
 export interface ChatToolCall {
 	id: string;
@@ -141,7 +142,7 @@ export interface StreamCallbacks {
 	onThinking: (text: string) => void;
 	onToolCall: (toolCall: ChatToolCall) => void;
 	onError: (error: Error) => void;
-	onDone: () => void;
+	onDone?: () => void;
 	onUsage?: (usage: ChatUsage) => void;
 }
 
@@ -164,7 +165,8 @@ export interface ModelDefinition {
 	maxInputTokens: number;
 	maxOutputTokens: number;
 	capabilities: {
-		toolCalling: boolean | number;
+		/** `false` disables tools; a number limits tools per request. */
+		toolCalling: false | number;
 		imageInput: boolean;
 		thinking: ThinkingCapability | false;
 	};
