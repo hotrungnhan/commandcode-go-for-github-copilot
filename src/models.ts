@@ -17,13 +17,14 @@ const NO_THINKING = false;
 
 /**
  * Compile-time model registry for the models available on Command Code Go.
+ * Last synchronized with the official Go-plan and CLI model catalogs on 2026-09-23.
  *
  * This is intentionally an allowlist rather than a copy of every upstream
  * model. Keep entries here aligned with the Go plan catalog so unsupported
  * models never appear in Copilot Chat's picker.
  *
- * Each entry uses the upstream `vendor/name` slug from `cmdc --list-models`
- * as the model id, which is sent unchanged to the Generate API.
+ * Each entry uses the exact model id from Command Code's `cmd --list-models`
+ * catalog, which is sent unchanged to the Generate API.
  *
  * Vision-capable models are flagged with `imageInput: true`. Tool calling
  * is assumed to be supported for every model — adjust per-entry if a
@@ -88,6 +89,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		category: 'Alibaba',
 	},
 	{
+		id: 'Qwen/Qwen3.8-Flash',
+		name: 'Qwen 3.8 Flash',
+		family: FAMILY,
+		version: '3.8',
+		detail: 'fast low-cost agentic coding & reasoning',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'Alibaba',
+	},
+	{
 		id: 'Qwen/Qwen3.8-Max',
 		name: 'Qwen 3.8 Max',
 		family: FAMILY,
@@ -99,6 +111,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		category: 'Alibaba',
 	},
 	{
+		id: 'Qwen/Qwen3.8-Max-0902',
+		name: 'Qwen 3.8 Max 0902',
+		family: FAMILY,
+		version: '3.8',
+		detail: 'upgraded Qwen 3.8 Max: stronger coding & agentic tool use',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'Alibaba',
+	},
+	{
 		id: 'Qwen/Qwen3.8-27B',
 		name: 'Qwen 3.8 27B',
 		family: FAMILY,
@@ -106,6 +129,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		detail: 'cost-efficient 27B vision & reasoning',
 		maxInputTokens: 262000,
 		maxOutputTokens: 32000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'Alibaba',
+	},
+	{
+		id: 'Qwen/Qwen3.8-Omni-Flash',
+		name: 'Qwen 3.8 Omni Flash',
+		family: FAMILY,
+		version: '3.8',
+		detail: 'omni-modal understanding & multimedia agentic work',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'Alibaba',
 	},
@@ -123,6 +157,28 @@ export const MODELS: readonly ModelDefinition[] = [
 		category: 'DeepSeek',
 	},
 	{
+		id: 'deepseek/deepseek-v4-flash-fast',
+		name: 'DeepSeek V4 Flash Fast',
+		family: FAMILY,
+		version: 'v4',
+		detail: 'low-latency V4 Flash deployment',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
+		category: 'DeepSeek',
+	},
+	{
+		id: 'deepseek/deepseek-v4-flash-vision-exp',
+		name: 'DeepSeek V4 Flash Vision (exp)',
+		family: FAMILY,
+		version: 'v4',
+		detail: 'fast hybrid-attention reasoning with vision',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'DeepSeek',
+	},
+	{
 		id: 'deepseek/deepseek-v4-pro',
 		name: 'DeepSeek V4 Pro',
 		family: FAMILY,
@@ -132,6 +188,43 @@ export const MODELS: readonly ModelDefinition[] = [
 		maxOutputTokens: 32000,
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
 		category: 'DeepSeek',
+	},
+	{
+		id: 'deepseek/deepseek-v4.1-flash',
+		name: 'DeepSeek V4.1 Flash',
+		family: FAMILY,
+		version: 'v4.1',
+		detail: 'V4.1 hybrid-attention reasoning with vision',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'DeepSeek',
+	},
+
+	// ---- inclusionAI ----
+	{
+		id: 'inclusionai/ling-3.0-flash-sante:free',
+		name: 'Ling 3.0 Flash Sante',
+		family: FAMILY,
+		version: '3.0',
+		detail: 'health & medicine tuned lightweight-MoE, still strong on code',
+		maxInputTokens: 262_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: NO_THINKING },
+		category: 'inclusionAI',
+	},
+
+	// ---- Meituan ----
+	{
+		id: 'meituan/LongCat-2.0',
+		name: 'LongCat 2.0',
+		family: FAMILY,
+		version: '2.0',
+		detail: 'trillion-parameter agentic coding with 1M context',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
+		category: 'Meituan',
 	},
 
 	// ---- Meta ----
@@ -143,6 +236,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		detail: 'Muse Spark 1.2 at ~95% off',
 		maxInputTokens: 1000000,
 		maxOutputTokens: 32000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'Meta',
+	},
+	{
+		id: 'meta/muse-spark-1.3-contributor',
+		name: 'Muse Spark 1.3 Contributor',
+		family: FAMILY,
+		version: '1.3',
+		detail: 'Muse Spark 1.3 at up to 95% off',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'Meta',
 	},
@@ -264,6 +368,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'OpenAI',
 	},
+	{
+		id: 'gpt-6-luna',
+		name: 'GPT-6 Luna',
+		family: FAMILY,
+		version: '6',
+		detail: 'most efficient OpenAI model for focused, high-volume tasks',
+		maxInputTokens: 1_100_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'OpenAI',
+	},
 	// ---- Poolside ----
 	{
 		id: 'poolside/laguna-s-2.1-free',
@@ -300,6 +415,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'StepFun',
 	},
+	{
+		id: 'stepfun/Step-5-Preview',
+		name: 'Step 5 Preview',
+		family: FAMILY,
+		version: '5',
+		detail: '600B sparse-MoE agentic coding with 1M context',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'StepFun',
+	},
 
 	// ---- Tencent ----
 	{
@@ -310,6 +436,17 @@ export const MODELS: readonly ModelDefinition[] = [
 		detail: 'sparse-MoE reasoning & agentic tool use',
 		maxInputTokens: 262000,
 		maxOutputTokens: 32000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
+		category: 'Tencent',
+	},
+	{
+		id: 'tencent/hy4-preview',
+		name: 'Tencent Hy4 Preview',
+		family: FAMILY,
+		version: 'hy4',
+		detail: 'agentic coding & sustained multi-step tool use',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
 		category: 'Tencent',
 	},
@@ -373,6 +510,28 @@ export const MODELS: readonly ModelDefinition[] = [
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: NO_THINKING },
 		category: 'Xiaomi',
 	},
+	{
+		id: 'xiaomi/mimo-v2.6-flash',
+		name: 'MiMo V2.6 Flash',
+		family: FAMILY,
+		version: 'v2.6',
+		detail: 'efficient multimodal agentic coding with 1M context',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: NO_THINKING },
+		category: 'Xiaomi',
+	},
+	{
+		id: 'xiaomi/mimo-v2.6-pro',
+		name: 'MiMo V2.6 Pro',
+		family: FAMILY,
+		version: 'v2.6',
+		detail: 'flagship multimodal agentic coding with 1M context',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: NO_THINKING },
+		category: 'Xiaomi',
+	},
 
 	// ---- Z AI ----
 	{
@@ -428,6 +587,28 @@ export const MODELS: readonly ModelDefinition[] = [
 		maxInputTokens: 1000000,
 		maxOutputTokens: 32000,
 		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: false, thinking: THINKING },
+		category: 'Z AI',
+	},
+	{
+		id: 'z-ai/glm-5.3-flash',
+		name: 'GLM-5.3 Flash',
+		family: FAMILY,
+		version: '5.3',
+		detail: 'fast, affordable GLM coding with 1M context',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
+		category: 'Z AI',
+	},
+	{
+		id: 'z-ai/glm-5.3-flashx',
+		name: 'GLM-5.3 FlashX',
+		family: FAMILY,
+		version: '5.3',
+		detail: 'high-speed GLM-5.3 Flash with 1M context',
+		maxInputTokens: 1_000_000,
+		maxOutputTokens: 32_000,
+		capabilities: { toolCalling: TOOLS_LIMIT, imageInput: true, thinking: THINKING },
 		category: 'Z AI',
 	},
 ];

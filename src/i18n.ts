@@ -38,13 +38,6 @@ const zh: Translations = {
 	'thinking.high': '深度',
 	'thinking.high.desc': '深度推理，适合复杂任务',
 
-	// Models
-	'models.refreshInProgress': '正在刷新模型列表...',
-	'models.refreshSucceeded': '已从 Command Code 拉取 {0} 个模型。',
-	'models.refreshFailed': '拉取模型列表失败：{0}',
-	'models.empty': '没有可用的模型。请检查 API Key，或调整模型黑名单设置。',
-	'models.fetchRequiresKey': '需要先配置 API Key 才能拉取模型列表。',
-
 	// Request
 	'request.toolsLimitExceeded':
 		'Command Code 单次 tools 请求最多支持 {0} 个 functions，当前请求包含 {1} 个。请先用 VS Code 的 Configure Tools 关闭不常用的工具。',
@@ -105,13 +98,6 @@ const en: Translations = {
 	'thinking.medium.desc': 'Recommended for everyday use',
 	'thinking.high': 'Deep',
 	'thinking.high.desc': 'Deep reasoning for complex tasks',
-
-	// Models
-	'models.refreshInProgress': 'Refreshing model list...',
-	'models.refreshSucceeded': 'Pulled {0} models from Command Code.',
-	'models.refreshFailed': 'Failed to refresh models: {0}',
-	'models.empty': 'No models are available. Check your API key or model blacklist.',
-	'models.fetchRequiresKey': 'Set an API key before refreshing the model list.',
 
 	// Request
 	'request.toolsLimitExceeded':

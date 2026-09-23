@@ -16,6 +16,8 @@ This extension is intentionally Go-plan-only. It does not support the Provider, 
 
 The canonical model list and availability are maintained by Command Code. See the [Go-plan model list](https://commandcode.ai/docs/plans/go#models) rather than relying on a static list in this README.
 
+The extension bundles the Go-plan model catalog. **Command Code Go: Refresh Model Picker** asks Copilot Chat to re-read that catalog; new models arrive with extension updates.
+
 ## Setup
 
 ### 1. Install Command Code and sign in

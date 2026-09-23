@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+- Synchronized the bundled allowlist with all 50 chat models currently listed for the Go plan.
+- Clarified that the refresh command reloads the model picker from the bundled catalog.
+
 ## 0.1.1 (2026-08-19)
 
 ### Features
