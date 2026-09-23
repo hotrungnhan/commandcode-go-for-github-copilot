@@ -4,7 +4,7 @@
     "commandcode-copilot.command.clearApiKey": "Command Code Go: Clear API Key",
     "commandcode-copilot.command.openSettings": "Command Code Go: Open Settings",
     "commandcode-copilot.command.showLogs": "Command Code Go: Show Logs",
-    "commandcode-copilot.command.refreshModels": "Command Code Go: Refresh Models",
+    "commandcode-copilot.command.refreshModels": "Command Code Go: Refresh Model Picker",
     "commandcode-copilot.walkthrough.title": "Command Code Go for VS Code",
     "commandcode-copilot.walkthrough.description": "Pick Command Code Go models from the Copilot Chat model picker.",
     "commandcode-copilot.walkthrough.setApiKey.title": "Set your Command Code Go API key",

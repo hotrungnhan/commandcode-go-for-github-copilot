@@ -68,7 +68,7 @@ export class CommandCodeChatProvider implements vscode.LanguageModelChatProvider
 		return this.authManager.hasApiKey();
 	}
 
-	/** Force Copilot Chat to re-query model information. */
+	/** Ask Copilot Chat to re-query the bundled model catalog. */
 	refreshModelPicker(): void {
 		this.onDidChangeLanguageModelChatInformationEmitter.fire();
 	}
